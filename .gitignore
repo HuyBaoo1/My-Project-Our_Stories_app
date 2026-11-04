@@ -17,3 +17,17 @@ Desktop.ini
 .vscode/
 *.swp
 *.swo
+
+# Dependencies and generated output
+node_modules/
+dist/
+*.tsbuildinfo
+.phase1-scaffold/
+playwright-report/
+test-results/
+coverage/
+.firebase/
+*-debug.log*
+ui-debug.log
+.emulator-data/
+artifacts/

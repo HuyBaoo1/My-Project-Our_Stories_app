@@ -4,3 +4,6 @@
 # Windows command scripts use CRLF.
 *.bat text eol=crlf
 *.cmd text eol=crlf
+
+# Preserve intentional Markdown hard breaks in the original handoff document.
+docs/handoff/README.md whitespace=-blank-at-eol

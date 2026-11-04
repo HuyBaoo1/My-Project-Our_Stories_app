@@ -1,0 +1,10 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Phase 1 has no backend features. Keep every client operation denied.
+    // The future membership/invite/revision design lives in docs/FIRESTORE_PROPOSAL.md.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
