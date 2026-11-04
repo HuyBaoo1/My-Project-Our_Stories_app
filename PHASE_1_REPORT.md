@@ -2,6 +2,8 @@
 
 Ngày thực hiện: **2026-11-05**, múi giờ `Asia/Ho_Chi_Minh`.
 
+**Cập nhật UI:** giao diện đầu tiên chưa được chủ repo duyệt. Giao diện đã được thiết kế lại theo reference CapLog; trạng thái vẫn **chờ duyệt UI**, chưa được phép sang Phase 2. Kết quả và ảnh kiểm tra mới nằm trong [UI_REDESIGN.md](docs/UI_REDESIGN.md). Các số liệu kiểm tra bên dưới ghi lại lượt triển khai Phase 1 ban đầu.
+
 **Kết quả:** đã triển khai skeleton và giao diện mock của Phase 1; lint, strict typecheck, build và 63 automated tests đã qua. **DỪNG để duyệt**, chưa chuyển sang Phase 2. Phase 0 đã có ma trận yêu cầu, quyết định UI và đề xuất schema/rules; thiết kế bảo mật vẫn cần review, chưa được xem là đã nghiệm thu.
 
 ## Đã hoàn thành

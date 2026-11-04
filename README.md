@@ -2,6 +2,8 @@
 
 Nhật ký chung theo lịch, tiếng Việt, dành cho gia đình và bạn bè. **Phase 1: giao diện chạy bằng dữ liệu mẫu, chưa phải ứng dụng nhật ký riêng tư dùng thật.**
 
+Giao diện hiện tại theo hướng sổ lưu niệm: nền giấy kẻ ô màu kem, xanh cobalt, bìa ngày với số lớn và sticker emoji/CSS. Lọc lịch theo người viết bằng các nút tròn; trang ngày vẫn hiển thị đầy đủ ghi chú chung. Xem [bản thiết kế UI](docs/UI_REDESIGN.md). **Đang chờ duyệt UI.**
+
 ## Chạy local
 
 Yêu cầu: Node.js 24.13+ (môi trường đã kiểm tra), npm 11; Java 21+ để chạy Firestore Emulator. Không cần tài khoản Firebase, Google OAuth hoặc thẻ thanh toán.
@@ -44,6 +46,7 @@ Lệnh trên chạy Auth (9099), Firestore (8080), Hosting (5000, cần build tr
 
 - [Báo cáo Phase 1](PHASE_1_REPORT.md): kết quả thực tế, giới hạn và bước tiếp theo.
 - [Ma trận yêu cầu và rủi ro](docs/REQUIREMENTS_MATRIX.md).
+- [Thiết kế lại UI và ảnh QA](docs/UI_REDESIGN.md).
 - [Đề xuất schema và Firestore Rules](docs/FIRESTORE_PROPOSAL.md).
 - [Checklist kiểm thử các phase tiếp theo](docs/TESTS_TO_WRITE.md).
 - [Bộ tài liệu handoff gốc](docs/handoff/README.md), được giữ riêng với trạng thái lịch sử ban đầu.

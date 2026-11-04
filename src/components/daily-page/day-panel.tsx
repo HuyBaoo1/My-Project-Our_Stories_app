@@ -61,8 +61,8 @@ export function DayPanel({ dayKey, fullPage = false, initialCompose = false, onS
           <span className={`avatar avatar-${index % 3}`}>{initials(note.authorName)}</span>
           <div className="min-w-0 flex-1"><h3 className="truncate text-sm font-semibold">{note.authorName}</h3><p className="mt-0.5 text-xs text-muted-foreground">{formatTime(note.createdAt)}{note.revision > 1 ? ` · đã sửa, v${note.revision}` : ''}</p></div>
           <details className="note-actions"><summary aria-label={`Tùy chọn ghi chú của ${note.authorName}`}><MoreHorizontal size={19} /></summary><div className="note-menu">
-            <Button variant="ghost" size="sm" onClick={() => { setEditing(note); setSaved(false) }}><Pencil />Chỉnh sửa</Button>
-            <Button variant="ghost" size="sm" onClick={() => setDeleting(note)}><Trash2 />Ẩn ghi chú</Button>
+            <Button variant="ghost" size="sm" onClick={(event) => { event.currentTarget.closest('details')?.removeAttribute('open'); setEditing(note); setSaved(false) }}><Pencil />Chỉnh sửa</Button>
+            <Button variant="ghost" size="sm" onClick={(event) => { event.currentTarget.closest('details')?.removeAttribute('open'); setDeleting(note) }}><Trash2 />Ẩn ghi chú</Button>
           </div></details>
         </div>
         {editing !== null && editing !== 'new' && editing.id === note.id

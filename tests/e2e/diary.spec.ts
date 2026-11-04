@@ -26,6 +26,25 @@ test('navigates to a historical month and keeps notes on their original date', a
   await expect(page.getByRole('region', { name: 'Trang nhật ký ngày' }).getByText('Một kỷ niệm của tháng trước.', { exact: false })).toBeVisible()
 })
 
+test('author filters change the calendar and persist through month navigation', async ({ page }) => {
+  await page.goto('/calendar')
+  const calendar = page.getByRole('region', { name: 'Lịch tháng', exact: true })
+  await expect(calendar.locator('.calendar-memory')).toHaveCount(5)
+  const author = page.getByRole('button', { name: 'Lọc lịch theo Gia Hân', exact: true })
+  await author.click()
+  await expect(author).toHaveAttribute('aria-pressed', 'true')
+  await expect(calendar.locator('.calendar-memory')).toHaveCount(1)
+  await expect(calendar.locator('.calendar-legend')).toContainText('1 ghi chú · 1 ngày có kỷ niệm')
+  await page.getByRole('button', { name: 'Tháng trước', exact: true }).click()
+  await expect(author).toHaveAttribute('aria-pressed', 'true')
+  await expect(calendar.locator('.calendar-memory')).toHaveCount(1)
+  await page.getByRole('button', { name: 'Tháng sau', exact: true }).click()
+  await page.getByRole('button', { name: 'Tất cả', exact: true }).click()
+  await expect(calendar.locator('.calendar-memory')).toHaveCount(5)
+  await page.getByRole('link', { name: 'Viết ghi chú cho ngày đang chọn', exact: true }).click()
+  await expect(page.getByRole('textbox', { name: 'Nội dung ghi chú' })).toBeVisible()
+})
+
 test('creates a formatted mock note and preserves its JSON on reload', async ({ page }, testInfo) => {
   await page.goto('/day/2024-02-29')
   await page.getByRole('button', { name: 'Viết một ghi chú', exact: true }).click()
@@ -66,6 +85,7 @@ test('edits a mock note with history then soft-deletes without discarding it', a
   await expect(note.getByText('Nội dung mẫu đã sửa.', { exact: true })).toBeVisible()
   await note.locator('.revision-history summary').click()
   await expect(note.locator('.revision-entry')).toContainText('Cốc cà phê vẫn còn ấm')
+  await note.locator('.note-actions summary').click()
   await note.getByRole('button', { name: 'Ẩn ghi chú', exact: true }).click()
   await page.getByRole('alertdialog').getByRole('button', { name: 'Ẩn ghi chú', exact: true }).click()
   await page.locator('.deleted-notes summary').click()

@@ -1,7 +1,9 @@
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
-import { ArrowLeft, ArrowRight, BookOpen, Feather, Leaf, LockKeyhole, ShieldCheck, Sparkles } from 'lucide-react'
+import { ArrowLeft, ArrowRight, ArrowUpRight, BookOpen, Feather, LockKeyhole, ShieldCheck, Sparkles } from 'lucide-react'
 import { Button } from '../components/ui/button'
 import { MonthCalendar } from '../components/calendar/month-calendar'
+import { DateCover } from '../components/calendar/date-cover'
+import { AuthorFilters } from '../components/calendar/author-filters'
 import { DayPanel } from '../components/daily-page/day-panel'
 import { useDiary } from '../features/notes/context'
 import { isDayKey, todayDayKey } from '../lib/date'
@@ -17,22 +19,32 @@ export function CalendarPage() {
   const month = isDayKey(requestedMonth) ? requestedMonth : `${today.slice(0, 7)}-01`
   const requestedDay = params.get('day') ?? today
   const selected = isDayKey(requestedDay) && requestedDay.slice(0, 7) === month.slice(0, 7) ? requestedDay : month
+  const authors = [...new Set(notes.filter((note) => !note.deleted).map((note) => note.authorName))]
+  const requestedAuthor = params.get('author') ?? ''
+  const author = authors.includes(requestedAuthor) ? requestedAuthor : ''
   const summaries: DaySummary[] = []
   for (const note of notes) {
-    if (note.deleted || !note.dayKey.startsWith(month.slice(0, 7))) continue
+    if (note.deleted || !note.dayKey.startsWith(month.slice(0, 7)) || (author && note.authorName !== author)) continue
     const existing = summaries.find((summary) => summary.dayKey === note.dayKey)
     if (existing) existing.count++
-    else summaries.push({ dayKey: note.dayKey, count: 1, preview: plainText(note.content).slice(0, 85) })
+    else {
+      const text = plainText(note.content)
+      const sticker = [...new Intl.Segmenter('vi', { granularity: 'grapheme' }).segment(text)].find((segment) => /\p{Extended_Pictographic}/u.test(segment.segment))?.segment ?? '📝'
+      summaries.push({ dayKey: note.dayKey, count: 1, preview: Array.from(text).slice(0, 85).join(''), sticker })
+    }
   }
   const selectDay = (day: string) => {
-    if (window.matchMedia('(min-width: 1200px)').matches) setParams({ month: day.slice(0, 7), day })
+    if (window.matchMedia('(min-width: 1200px)').matches) setParams({ month: day.slice(0, 7), day, ...(author ? { author } : {}) })
     else navigate(`/day/${day}`)
   }
   return <div className="calendar-page">
-    <div className="page-intro"><div><p className="eyebrow"><span />NHỮNG MẢNH GHÉP THƯỜNG NGÀY</p><h1>Cùng nhau, qua từng ngày<span>.</span></h1><p className="page-description">Một nơi để kể, để nhớ, để thấy mình gần nhau hơn.</p></div><div className="intro-flower" aria-hidden="true">✳<span>little moments,<br />lasting stories</span></div></div>
-    <div className="mock-notice"><Leaf size={15} /><p>Bạn đang xem <strong>dữ liệu mẫu</strong>. Ghi chú chỉ lưu trên trình duyệt này.</p><Link to="/about" aria-label="Tìm hiểu về bản thử nghiệm"><ArrowRight size={16} /></Link></div>
-    <div className="calendar-and-day"><MonthCalendar month={month} selectedDay={selected} summaries={summaries} onMonth={(day) => setParams({ month: day.slice(0, 7), day })} onSelect={selectDay} /><div className="desktop-day"><DayPanel key={selected} dayKey={selected} onSelectDay={selectDay} /></div></div>
-    <footer className="page-footer"><span><LockKeyhole size={12} />Chưa kết nối Firebase · Không có dữ liệu dùng chung</span><span>Viết một chút. Nhớ lâu hơn.</span></footer>
+    <div className="page-intro"><h1>Cùng nhau, qua từng ngày.</h1><span>NHỮNG NGÀY BÊN NHAU / VOL. 01</span></div>
+    <div className="calendar-and-day"><div className="calendar-column">
+      <DateCover dayKey={selected} noteCount={notes.filter((note) => !note.deleted && note.dayKey === selected).length} />
+      <AuthorFilters authors={authors} selected={author} dayKey={selected} onSelect={(name) => setParams({ month: month.slice(0, 7), day: selected, ...(name ? { author: name } : {}) })} />
+      <MonthCalendar month={month} selectedDay={selected} summaries={summaries} onMonth={(day) => setParams({ month: day.slice(0, 7), day, ...(author ? { author } : {}) })} onSelect={selectDay} />
+    </div><div className="desktop-day"><DayPanel key={selected} dayKey={selected} onSelectDay={selectDay} /><p className="panel-footnote">a little note, a lasting memory.</p></div></div>
+    <footer className="page-footer"><span><LockKeyhole size={13} />Bản thử nghiệm · dữ liệu mẫu trên trình duyệt</span><Link to="/about">Về cuốn sổ này<ArrowUpRight size={13} /></Link></footer>
   </div>
 }
 
@@ -41,7 +53,7 @@ export function DayPage() {
   const navigate = useNavigate()
   const [params] = useSearchParams()
   if (!isDayKey(dateKey)) return <NotFound message="Ngày không hợp lệ. Vui lòng chọn một ngày từ lịch." />
-  return <div className="full-day-container"><Link className="back-link" to={`/calendar?month=${dateKey.slice(0, 7)}&day=${dateKey}`}><ArrowLeft size={16} />Trở về lịch kỷ niệm</Link><div className="full-day-heading"><p className="eyebrow">MỖI NGÀY, MỘT CÂU CHUYỆN</p><h1>Chuyện của ngày này<span>.</span></h1></div><div className="mock-notice"><Leaf size={15} /><p>Dữ liệu mẫu · chỉ lưu trên trình duyệt này.</p></div><DayPanel key={dateKey} dayKey={dateKey} fullPage initialCompose={params.get('write') === '1'} onSelectDay={(day) => navigate(`/day/${day}`)} /></div>
+  return <div className="full-day-container"><Link className="back-link" to={`/calendar?month=${dateKey.slice(0, 7)}&day=${dateKey}`}><ArrowLeft size={16} />Trở về lịch kỷ niệm</Link><div className="full-day-heading"><p className="eyebrow">MỖI NGÀY, MỘT CÂU CHUYỆN</p><h1>Chuyện của ngày này<span> ♡</span></h1></div><div className="mock-notice"><span className="notice-dot" /><p>Dữ liệu mẫu · chỉ lưu trên trình duyệt này.</p></div><DayPanel key={dateKey} dayKey={dateKey} fullPage initialCompose={params.get('write') === '1'} onSelectDay={(day) => navigate(`/day/${day}`)} /></div>
 }
 
 export function JoinPage() {
