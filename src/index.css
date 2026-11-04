@@ -67,6 +67,7 @@ h1, h2, h3, p { margin: 0; }
 .cover-ordinal span { text-transform: uppercase; font-size: 9px; }
 .cover-number { font-family: 'Arial Black', 'Segoe UI', sans-serif; font-size: 179px; font-weight: 900; line-height: 1; letter-spacing: -14px; padding-right: 13px; margin-top: -3px; }
 .cover-sticker { position: absolute; z-index: 2; line-height: 1; user-select: none; filter: drop-shadow(3px 0 0 white) drop-shadow(-3px 0 0 white) drop-shadow(0 3px 0 white) drop-shadow(0 -3px 0 white) drop-shadow(0 6px 4px #33343720); }
+.cover-sticker img { display: block; width: 1em; height: 1em; object-fit: contain; }
 .sticker-coffee { font-size: 116px; left: 27px; top: 24px; transform: rotate(-17deg); }
 .sticker-flower { font-size: 105px; right: 23px; top: 29px; transform: rotate(16deg); }
 .sticker-letter { font-size: 105px; bottom: 31px; left: 27px; transform: rotate(-14deg); }

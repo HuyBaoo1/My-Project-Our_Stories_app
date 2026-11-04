@@ -2,7 +2,7 @@
 
 Nhật ký chung theo lịch, tiếng Việt, dành cho gia đình và bạn bè. **Phase 1: giao diện chạy bằng dữ liệu mẫu, chưa phải ứng dụng nhật ký riêng tư dùng thật.**
 
-Giao diện hiện tại theo hướng sổ lưu niệm: nền giấy kẻ ô màu kem, xanh cobalt, bìa ngày với số lớn và sticker emoji/CSS. Lọc lịch theo người viết bằng các nút tròn; trang ngày vẫn hiển thị đầy đủ ghi chú chung. Xem [bản thiết kế UI](docs/UI_REDESIGN.md). **Đang chờ duyệt UI.**
+Giao diện hiện tại theo hướng sổ lưu niệm: nền giấy kẻ ô màu kem, xanh cobalt, bìa ngày với số lớn và sticker PNG tách local từ ảnh tham chiếu. Lọc lịch theo người viết bằng các nút tròn; trang ngày vẫn hiển thị đầy đủ ghi chú chung. Xem [bản thiết kế UI](docs/UI_REDESIGN.md) và [phạm vi sticker Phase 1](docs/STICKER_PHASE1_PLAN.md). **Đang chờ duyệt UI.**
 
 ## Chạy local
 
@@ -19,6 +19,8 @@ Mở **http://127.0.0.1:5173**. Các trang: `/calendar`, `/day/2026-11-05`, `/jo
 - Tiptap: đoạn văn, xuống dòng, đậm/nghiêng, danh sách, liên kết HTTP(S), emoji.
 - Thử thêm/sửa/ẩn ghi chú: JSON nằm trong `localStorage`, bản nháp trong `sessionStorage`. Không nhập dữ liệu riêng tư. Xóa dữ liệu trình duyệt có thể làm mất bản mẫu.
 - Revision/conflict/history trong mock chỉ minh họa. Không bảo đảm ghi đồng thời giữa các tab hoặc các thiết bị.
+- Thử tính năng sticker: mở một ngày trống, lưu ghi chú đầu tiên, bấm **Chọn sticker cho ngày**, chọn và xác nhận. Chỉ người viết đầu tiên được chọn một lần; chưa chọn thì để chờ. Sticker xuất hiện trên lịch và trang ngày, vẫn được giữ sau khi ẩn ghi chú đầu tiên. Bản mẫu cũ không có thứ tự lưu đáng tin cậy sẽ không tự cấp quyền chọn.
+- Bộ 15 sticker chỉ là file tĩnh trong repo; không có upload hoặc lưu ảnh vào database. [Contact sheet](public/stickers/contact-sheet.png) và [ghi chú chất lượng/quyền phân phối](docs/STICKER_ASSETS.md) cần được review trước phát hành.
 - Dữ liệu hư/không đọc được quay về fixture. Dữ liệu mẫu tập trung ở `src/mocks/fixtures.ts`.
 - Chưa có Google login, membership, invite thật, realtime Firestore hoặc backup/restore.
 
@@ -47,6 +49,7 @@ Lệnh trên chạy Auth (9099), Firestore (8080), Hosting (5000, cần build tr
 - [Báo cáo Phase 1](PHASE_1_REPORT.md): kết quả thực tế, giới hạn và bước tiếp theo.
 - [Ma trận yêu cầu và rủi ro](docs/REQUIREMENTS_MATRIX.md).
 - [Thiết kế lại UI và ảnh QA](docs/UI_REDESIGN.md).
+- [Thiết kế first writer/sticker](docs/FIRST_WRITER_DESIGN.md): phần mock đã triển khai và phần Firestore còn là đề xuất.
 - [Đề xuất schema và Firestore Rules](docs/FIRESTORE_PROPOSAL.md).
 - [Checklist kiểm thử các phase tiếp theo](docs/TESTS_TO_WRITE.md).
 - [Bộ tài liệu handoff gốc](docs/handoff/README.md), được giữ riêng với trạng thái lịch sử ban đầu.

@@ -7,6 +7,9 @@ import { RichText } from '../note-editor/rich-text'
 import { useDiary } from '../../features/notes/context'
 import { formatDay, formatTime, initials, shiftDay, todayDayKey } from '../../lib/date'
 import type { DiaryNote } from '../../types/diary'
+import { MOCK_MEMBER } from '../../mocks/fixtures'
+import { DailyStickerBadge } from '../../features/stickers/DailyStickerBadge'
+import { StickerPicker } from '../../features/stickers/StickerPicker'
 
 interface Props { dayKey: string; fullPage?: boolean; initialCompose?: boolean; onSelectDay: (day: string) => void }
 
@@ -30,6 +33,9 @@ export function DayPanel({ dayKey, fullPage = false, initialCompose = false, onS
   const [deleting, setDeleting] = useState<DiaryNote | null>(null)
   const [error, setError] = useState('')
   const [saved, setSaved] = useState(false)
+  const [stickerPickerOpen, setStickerPickerOpen] = useState(false)
+  const dayMetadata = store.getDayMetadata(dayKey)
+  const canChooseSticker = dayMetadata?.firstWriterUserId === MOCK_MEMBER.uid && dayMetadata.representativeStickerId === null
   const dayNotes = notes.filter((note) => note.dayKey === dayKey && !note.deleted).sort((a, b) => a.createdAt.localeCompare(b.createdAt))
   const deletedNotes = notes.filter((note) => note.dayKey === dayKey && note.deleted)
   const prev = shiftDay(dayKey, -1)
@@ -45,6 +51,7 @@ export function DayPanel({ dayKey, fullPage = false, initialCompose = false, onS
           <Button variant="ghost" size="icon" aria-label="Ngày sau" disabled={next > '2100-12-31'} onClick={() => onSelectDay(next)}><ChevronRight /></Button>
         </div>
       </div>
+      <DailyStickerBadge metadata={dayMetadata} canChoose={canChooseSticker} onChoose={() => setStickerPickerOpen(true)} />
       <div className="mt-5 flex items-center justify-between gap-2">
         <p className="text-xs text-muted-foreground">{dayNotes.length} ghi chú · một trang chung</p>
         {!fullPage && <Link className="expand-link" to={`/day/${dayKey}`}>Mở rộng <ArrowUpRight size={14} /></Link>}
@@ -76,6 +83,7 @@ export function DayPanel({ dayKey, fullPage = false, initialCompose = false, onS
       <div className="day-ending"><span /><Feather size={15} /><span /></div>
       <p className="day-caption">Mỗi dòng viết, một chút gần nhau hơn.</p>
     </div>
+    {stickerPickerOpen && <StickerPicker onConfirm={(id) => { store.assignDaySticker(dayKey, id, MOCK_MEMBER.uid); setSaved(true) }} onClose={() => setStickerPickerOpen(false)} />}
     {deleting && <DeleteConfirmation onClose={() => setDeleting(null)} onConfirm={() => {
         try { store.softDelete(deleting.id, deleting.revision); setDeleting(null); setError('') } catch (failure) { setError(failure instanceof Error ? failure.message : 'Không ẩn được ghi chú.'); setDeleting(null) }
       }} />}

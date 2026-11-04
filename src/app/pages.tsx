@@ -13,7 +13,7 @@ import type { DaySummary } from '../types/diary'
 export function CalendarPage() {
   const [params, setParams] = useSearchParams()
   const navigate = useNavigate()
-  const { notes } = useDiary()
+  const { notes, store } = useDiary()
   const today = todayDayKey()
   const requestedMonth = `${params.get('month') ?? today.slice(0, 7)}-01`
   const month = isDayKey(requestedMonth) ? requestedMonth : `${today.slice(0, 7)}-01`
@@ -23,15 +23,16 @@ export function CalendarPage() {
   const requestedAuthor = params.get('author') ?? ''
   const author = authors.includes(requestedAuthor) ? requestedAuthor : ''
   const summaries: DaySummary[] = []
-  for (const note of notes) {
-    if (note.deleted || !note.dayKey.startsWith(month.slice(0, 7)) || (author && note.authorName !== author)) continue
-    const existing = summaries.find((summary) => summary.dayKey === note.dayKey)
-    if (existing) existing.count++
-    else {
-      const text = plainText(note.content)
-      const sticker = [...new Intl.Segmenter('vi', { granularity: 'grapheme' }).segment(text)].find((segment) => /\p{Extended_Pictographic}/u.test(segment.segment))?.segment ?? '📝'
-      summaries.push({ dayKey: note.dayKey, count: 1, preview: Array.from(text).slice(0, 85).join(''), sticker })
-    }
+  const monthDays = new Set(notes.filter((note) => note.dayKey.startsWith(month.slice(0, 7))).map((note) => note.dayKey))
+  for (const dayKey of monthDays) {
+    const visibleNotes = notes.filter((note) => note.dayKey === dayKey && !note.deleted && (!author || note.authorName === author))
+    const metadata = store.getDayMetadata(dayKey)
+    if (visibleNotes.length === 0 && (author || !metadata)) continue
+    summaries.push({
+      dayKey, count: visibleNotes.length,
+      preview: visibleNotes[0] ? Array.from(plainText(visibleNotes[0].content)).slice(0, 85).join('') : 'Ghi chú đã ẩn; dấu ấn của ngày vẫn được giữ.',
+      representativeStickerId: metadata?.representativeStickerId ?? null,
+    })
   }
   const selectDay = (day: string) => {
     if (window.matchMedia('(min-width: 1200px)').matches) setParams({ month: day.slice(0, 7), day, ...(author ? { author } : {}) })
@@ -61,7 +62,7 @@ export function JoinPage() {
 }
 
 export function AboutPage() {
-  return <div className="about-page"><p className="eyebrow"><Sparkles size={14} />OUR STORIES · PHASE 1</p><h1>Một góc nhỏ, đang thành hình<span>.</span></h1><p className="page-description">Bản thử nghiệm giao diện của cuốn nhật ký chung.</p><div className="about-grid"><section><Feather /><h2>Bạn có thể thử</h2><p>Mở lịch tháng, đi đến một ngày, viết và chỉnh sửa ghi chú có định dạng. Dữ liệu mẫu được lưu trên trình duyệt để bạn thử tải lại trang.</p><p>Bản nháp nằm trong phiên trình duyệt. Bản sửa cũ và ghi chú đã ẩn được giữ trong dữ liệu mẫu.</p></section><section><ShieldCheck /><h2>Trước khi sử dụng thật</h2><p>Chưa có đăng nhập Google, liên kết mời, kiểm tra thành viên hoặc đồng bộ giữa các thiết bị. Đây chưa phải nơi lưu nhật ký riêng tư.</p><p>Firestore đang chặn mọi truy cập. Bảo mật, lịch sử và khôi phục dữ liệu thật cần được kiểm thử ở các phase tiếp theo.</p></section></div><p className="about-warning">Đừng nhập nội dung riêng tư vào bản thử nghiệm. Khi xóa dữ liệu trình duyệt, ghi chú mẫu có thể mất. Kiểm tra phiên bản trong mock chỉ minh họa và không bảo đảm ghi đồng thời giữa các tab.</p><Button asChild><Link to="/calendar"><ArrowLeft />Quay về lịch kỷ niệm</Link></Button></div>
+  return <div className="about-page"><p className="eyebrow"><Sparkles size={14} />OUR STORIES · PHASE 1</p><h1>Một góc nhỏ, đang thành hình<span>.</span></h1><p className="page-description">Bản thử nghiệm giao diện của cuốn nhật ký chung.</p><div className="about-grid"><section><Feather /><h2>Bạn có thể thử</h2><p>Mở lịch tháng, đi đến một ngày, viết và chỉnh sửa ghi chú có định dạng. Dữ liệu mẫu được lưu trên trình duyệt để bạn thử tải lại trang.</p><p>Người lưu ghi chú đầu tiên của ngày mới được chọn một sticker đại diện. Dấu ấn này được giữ lại cả khi ghi chú đầu tiên bị ẩn; dữ liệu mẫu cũ chưa biết thứ tự ghi sẽ không tự nhận quyền chọn.</p><p>Bản nháp nằm trong phiên trình duyệt. Bản sửa cũ và ghi chú đã ẩn được giữ trong dữ liệu mẫu.</p></section><section><ShieldCheck /><h2>Trước khi sử dụng thật</h2><p>Chưa có đăng nhập Google, liên kết mời, kiểm tra thành viên hoặc đồng bộ giữa các thiết bị. Đây chưa phải nơi lưu nhật ký riêng tư.</p><p>Firestore đang chặn mọi truy cập. Bảo mật, lịch sử và khôi phục dữ liệu thật cần được kiểm thử ở các phase tiếp theo.</p></section></div><p className="about-warning">Đừng nhập nội dung riêng tư vào bản thử nghiệm. Khi xóa dữ liệu trình duyệt, ghi chú mẫu có thể mất. Kiểm tra phiên bản và người viết đầu tiên trong mock chỉ minh họa, không bảo đảm ghi đồng thời giữa các tab.</p><Button asChild><Link to="/calendar"><ArrowLeft />Quay về lịch kỷ niệm</Link></Button></div>
 }
 
 export function NotFound({ message = 'Trang này không tồn tại trong cuốn nhật ký.' }: { message?: string }) {

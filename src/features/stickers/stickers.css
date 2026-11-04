@@ -1,0 +1,86 @@
+.sticker-image { position: relative; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; aspect-ratio: 1; }
+.sticker-image img { display: block; object-fit: contain; width: 100%; height: 100%; transition: opacity 150ms; }
+.sticker-image[data-image-state='loading'] img { opacity: 0; }
+.sticker-image-placeholder { position: absolute; inset: 10%; border-radius: 50%; background: #e9eaf4; border: 1px dashed #c7cceb; }
+.sticker-image-error { display: flex; flex-direction: column; gap: 3px; justify-content: center; align-items: center; width: 100%; height: 100%; color: #8790ba; text-align: center; }
+.sticker-image-error svg { width: 22px; height: 22px; stroke-width: 1.4; }
+.sticker-image-error > span { font-size: 8px; line-height: 1.3; }
+.calendar-day-sticker { width: 49px; height: 49px; }
+.calendar-sticker-image { width: 49px; height: 49px; filter: drop-shadow(1px 0 0 white) drop-shadow(-1px 0 0 white) drop-shadow(0 1px 0 white) drop-shadow(0 -1px 0 white) drop-shadow(0 3px 2px #25294524); }
+.calendar-sticker-image .sticker-image-error > span { display: none; }
+.calendar-sticker-pending { display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 3px; width: 49px; height: 49px; border: 1px dashed #b7bfdf; border-radius: 13px; color: #8b95c5; background: #f4f3f988; }
+.calendar-sticker-pending svg { width: 20px; height: 20px; stroke-width: 1.3; }
+.calendar-sticker-pending > span { font-size: 7px; line-height: 1; }
+.daily-sticker-badge { display: flex; align-items: center; gap: 13px; margin: 20px 0 0; padding: 14px 12px; border: 1px dashed #d2d5e8; border-radius: 13px; background: #f4f2fb80; }
+.daily-sticker-image { width: 65px; height: 65px; filter: drop-shadow(0 3px 2px #37395212); }
+.daily-sticker-empty { width: 49px; height: 55px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: #9aa3d0; }
+.daily-sticker-empty svg { width: 30px; height: 30px; stroke-width: 1.2; }
+.daily-sticker-copy { min-width: 0; flex: 1; }
+.daily-sticker-eyebrow { color: #8a90b1; font-size: 7px; letter-spacing: 1.4px; line-height: 1.5; margin: 0 0 5px; }
+.daily-sticker-copy h3 { font-size: 12px; font-weight: 600; line-height: 1.6; color: #4357b5; }
+.first-writer-info { display: flex; align-items: flex-start; gap: 5px; color: #7d85aa; font-size: 10px; line-height: 1.7; margin-top: 6px; }
+.first-writer-info svg { width: 11px; height: 11px; flex-shrink: 0; margin-top: 3px; }
+.first-writer-info strong { font-weight: 600; color: #58649b; }
+.sticker-pending-hint { font-size: 9px; color: #9499b2; line-height: 1.7; margin-top: 6px; }
+.choose-day-sticker { height: 31px; border-radius: 20px; font-size: 10px; padding: 0 10px; margin-top: 10px; border-color: #c4cbed; background: #fffefb; }
+.choose-day-sticker svg { width: 13px; height: 13px; }
+.day-page .daily-sticker-badge { padding: 16px 18px; gap: 17px; }
+.day-page .daily-sticker-image { width: 82px; height: 82px; }
+.day-page .daily-sticker-copy h3 { font-size: 14px; }
+.day-page .first-writer-info { font-size: 11px; }
+.sticker-picker-dialog { color: var(--foreground); background: #fffefa; border: 1px solid #d8dbed; border-radius: 23px; padding: 27px; margin: auto; width: min(580px, calc(100% - 28px)); max-height: min(87dvh, 790px); overflow-y: auto; overscroll-behavior: contain; box-shadow: 0 22px 80px #17245e29; }
+.sticker-picker-dialog::backdrop { background: #25306555; backdrop-filter: blur(4px); }
+.sticker-picker-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 15px; position: sticky; top: -27px; margin: -27px -27px 0; padding: 22px 27px 15px; background: #fffefa; border-bottom: 1px solid #ececf4; z-index: 2; }
+.sticker-picker-header h2 { color: var(--primary); font: bold 28px/1.3 Georgia, 'Times New Roman', serif; letter-spacing: -.7px; margin-top: 7px; }
+.sticker-picker-header > button { flex-shrink: 0; width: 34px; height: 34px; border-radius: 50%; color: #7a85bc; }
+.sticker-picker-description { color: #838aa8; font-size: 12px; line-height: 1.85; margin: 15px 0 22px; }
+.sticker-picker-fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
+.sticker-picker-fieldset legend { font-size: 10px; color: #8b91ae; padding: 0; margin-bottom: 13px; }
+.sticker-picker-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; }
+.sticker-option { position: relative; min-width: 0; display: flex; flex-direction: column; align-items: center; gap: 7px; background: #f7f6f0; padding: 10px 5px 9px; border-radius: 13px; border: 1px solid transparent; cursor: pointer; }
+.sticker-option:hover { border-color: #c3caed; background: #f0f1fa; }
+.sticker-option input { position: absolute; clip-path: inset(50%); width: 1px; height: 1px; overflow: hidden; white-space: nowrap; }
+.sticker-option:has(input:focus-visible) { outline: 2px solid var(--primary); outline-offset: 3px; }
+.sticker-option:has(input:checked) { background: #e9edff; border-color: #7b8ad9; }
+.sticker-option-image { width: 61px; height: 61px; max-width: 100%; }
+.sticker-option-name { color: #727caa; font-size: 9px; line-height: 1.55; text-align: center; min-height: 28px; overflow-wrap: anywhere; }
+.sticker-option-check { position: absolute; top: 5px; right: 5px; width: 16px; height: 16px; background: var(--primary); border-radius: 50%; color: white; display: none; align-items: center; justify-content: center; }
+.sticker-option-check svg { width: 10px; height: 10px; stroke-width: 2.5; }
+.sticker-option:has(input:checked) .sticker-option-check { display: flex; }
+.sticker-option-unavailable { opacity: .6; cursor: default; }
+.sticker-picker-fieldset:disabled .sticker-option { cursor: wait; opacity: .6; }
+.sticker-picker-image-warning, .sticker-picker-error { font-size: 11px; line-height: 1.8; padding: 11px 12px; margin-top: 16px; border-radius: 8px; }
+.sticker-picker-image-warning { background: #f6efdf; color: #8d7751; }
+.sticker-picker-error { background: #f9e9ea; color: var(--destructive); }
+.sticker-picker-footer { position: sticky; bottom: -27px; display: flex; justify-content: space-between; align-items: center; gap: 12px; margin: 20px -4px 0; padding: 13px 4px 11px; background: #fffefa; border-top: 1px solid #e3e6f1; z-index: 1; }
+.sticker-picker-selection { display: flex; align-items: center; gap: 8px; min-width: 0; color: #7e88ae; font-size: 10px; line-height: 1.6; }
+.sticker-picker-selection > span:last-child { overflow-wrap: anywhere; }
+.sticker-selected-image { width: 35px; height: 35px; }
+.sticker-confirm-button { border-radius: 23px; font-size: 11px; height: 39px; padding: 0 14px; flex-shrink: 0; }
+.sticker-picker-local-note { color: #999db2; font-size: 9px; line-height: 1.7; margin-top: 10px; }
+@media (max-width: 767px) {
+  .calendar-day-sticker, .calendar-sticker-image { width: 32px; height: 32px; }
+  .calendar-sticker-pending { width: 31px; height: 33px; border-radius: 9px; gap: 2px; }
+  .calendar-sticker-pending svg { width: 14px; height: 14px; }
+  .calendar-sticker-pending > span { font-size: 5px; }
+  .calendar-sticker-image .sticker-image-error svg { width: 17px; height: 17px; }
+  .day-page .daily-sticker-badge { padding: 12px 10px; gap: 10px; }
+  .day-page .daily-sticker-image { width: 60px; height: 60px; }
+  .day-page .daily-sticker-copy h3 { font-size: 12px; }
+  .day-page .first-writer-info { font-size: 10px; }
+  .sticker-picker-dialog { padding: 20px; max-height: 88dvh; border-radius: 20px; }
+  .sticker-picker-header h2 { font-size: 24px; }
+  .sticker-picker-header { top: -20px; margin: -20px -20px 0; padding: 17px 20px 12px; }
+  .sticker-picker-header .daily-sticker-eyebrow { font-size: 6px; letter-spacing: 1px; }
+  .sticker-picker-header > button { width: 28px; height: 28px; }
+  .sticker-picker-description { font-size: 11px; margin-bottom: 18px; }
+  .sticker-picker-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 9px; }
+  .sticker-option { padding: 9px 4px 7px; }
+  .sticker-option-image { width: 60px; height: 60px; }
+  .sticker-option-name { font-size: 8px; min-height: 25px; }
+  .sticker-picker-footer { bottom: -20px; }
+  .sticker-confirm-button { font-size: 10px; padding: 0 11px; height: 37px; }
+  .sticker-picker-selection { font-size: 9px; gap: 6px; }
+  .sticker-selected-image { width: 27px; height: 27px; }
+}
+@media (prefers-reduced-motion: reduce) { .sticker-image img { transition: none; } }

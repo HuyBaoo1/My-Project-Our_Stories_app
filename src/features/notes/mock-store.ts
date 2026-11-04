@@ -2,9 +2,12 @@ import { isDayKey } from '../../lib/date'
 import { parseRichText, plainText } from '../../lib/rich-text'
 import { createMockNotes, MOCK_MEMBER } from '../../mocks/fixtures'
 import type { DiaryNote, RichDocument } from '../../types/diary'
+import { isStickerId } from '../stickers/stickerCatalog'
+import { metadataForExistingNotes, metadataForFirstNote, parseDayMetadataMap, type DayMetadata, type DayMetadataMap, type MockActor } from '../stickers/day-metadata'
 
 export const MOCK_STORAGE_KEY = 'our-stories:mock-notes:v1'
 type Persistence = Pick<Storage, 'getItem' | 'setItem'>
+interface StoredDiary { schemaVersion: 2; notes: DiaryNote[]; dayMetadata: DayMetadataMap }
 export class RevisionConflict extends Error {
   readonly current: DiaryNote
   constructor(current: DiaryNote) { super('Ghi chú đã có bản mới. Bản nháp của bạn vẫn được giữ lại.'); this.current = current }
@@ -27,31 +30,61 @@ function validateNotes(input: unknown): DiaryNote[] {
   })
 }
 
+function parseStoredDiary(input: unknown): StoredDiary {
+  // Keep the old key and accept its v1 array shape, without rewriting or losing notes.
+  if (Array.isArray(input)) {
+    const notes = validateNotes(input)
+    return { schemaVersion: 2, notes, dayMetadata: metadataForExistingNotes(notes, 'legacy-unknown') }
+  }
+  if (!input || typeof input !== 'object') throw new Error('Dữ liệu mẫu không hợp lệ.')
+  const stored = input as Record<string, unknown>
+  if (stored.schemaVersion !== 2) throw new Error('Phiên bản dữ liệu mẫu không được hỗ trợ.')
+  const notes = validateNotes(stored.notes)
+  return { schemaVersion: 2, notes, dayMetadata: parseDayMetadataMap(stored.dayMetadata, notes) }
+}
+
 // A local prototype adapter only. No Firebase imports, writes, authentication or network.
 export class MockDiaryStore {
   private notes: DiaryNote[]
+  private dayMetadata: DayMetadataMap
+  private actor: MockActor
   private persistence: Persistence | undefined
   private listeners = new Set<() => void>()
-  constructor(persistence?: Persistence, initial = createMockNotes()) {
+  constructor(persistence?: Persistence, initial = createMockNotes(), actor: MockActor = MOCK_MEMBER) {
+    if (!actor.uid.trim() || !actor.name.trim()) throw new Error('Người viết mẫu không hợp lệ.')
     this.persistence = persistence
+    this.actor = { uid: actor.uid, name: actor.name }
     this.notes = initial
+    this.dayMetadata = metadataForExistingNotes(initial, 'fixture-order')
     try {
       const saved = persistence?.getItem(MOCK_STORAGE_KEY)
-      if (saved && saved.length < 4_000_000) this.notes = validateNotes(JSON.parse(saved))
+      if (saved && saved.length < 4_000_000) {
+        const stored = parseStoredDiary(JSON.parse(saved))
+        this.notes = stored.notes
+        this.dayMetadata = stored.dayMetadata
+      }
     } catch { /* Invalid/unavailable mock storage falls back to explicit fixtures. */ }
   }
   getSnapshot = () => this.notes
+  getDayMetadata = (dayKey: string): DayMetadata | undefined => this.dayMetadata[dayKey]
   subscribe = (listener: () => void) => { this.listeners.add(listener); return () => { this.listeners.delete(listener) } }
-  private commit(next: DiaryNote[]) {
+  private commit(next: DiaryNote[], dayMetadata = this.dayMetadata) {
     // Persist before publishing; quota/disabled-storage errors keep the unsaved editor open.
-    this.persistence?.setItem(MOCK_STORAGE_KEY, JSON.stringify(next))
+    const stored: StoredDiary = { schemaVersion: 2, notes: next, dayMetadata }
+    this.persistence?.setItem(MOCK_STORAGE_KEY, JSON.stringify(stored))
     this.notes = next
+    this.dayMetadata = dayMetadata
     this.listeners.forEach((listener) => listener())
   }
   refreshFromStorage() {
     const saved = this.persistence?.getItem(MOCK_STORAGE_KEY)
     if (!saved || saved.length >= 4_000_000) return
-    try { this.notes = validateNotes(JSON.parse(saved)); this.listeners.forEach((listener) => listener()) } catch { /* Ignore malformed external local data. */ }
+    try {
+      const stored = parseStoredDiary(JSON.parse(saved))
+      this.notes = stored.notes
+      this.dayMetadata = stored.dayMetadata
+      this.listeners.forEach((listener) => listener())
+    } catch { /* Ignore malformed external local data. */ }
   }
   save(dayKey: string, input: RichDocument, id?: string, expectedRevision?: number): DiaryNote {
     if (!isDayKey(dayKey)) throw new Error('Ngày không hợp lệ.')
@@ -60,9 +93,11 @@ export class MockDiaryStore {
     this.refreshFromStorage()
     const now = new Date().toISOString()
     if (!id) {
-      const note: DiaryNote = { id: crypto.randomUUID(), dayKey, authorUid: MOCK_MEMBER.uid, authorName: MOCK_MEMBER.name,
+      const note: DiaryNote = { id: crypto.randomUUID(), dayKey, authorUid: this.actor.uid, authorName: this.actor.name,
         content, createdAt: now, updatedAt: now, revision: 1, deleted: false, revisions: [] }
-      this.commit([...this.notes, note])
+      const metadata = this.dayMetadata[dayKey] ? this.dayMetadata
+        : { ...this.dayMetadata, [dayKey]: metadataForFirstNote(note, 'local-commit') }
+      this.commit([...this.notes, note], metadata)
       return note
     }
     const current = this.notes.find((note) => note.id === id)
@@ -73,6 +108,21 @@ export class MockDiaryStore {
       revisions: [...current.revisions, { revision: current.revision, content: current.content, editedAt: now, action: 'edit' }] }
     this.commit(this.notes.map((note) => note.id === id ? updated : note))
     return updated
+  }
+  assignDaySticker(dayKey: string, stickerId: string, actorUid: string): void {
+    if (!isDayKey(dayKey)) throw new Error('Ngày không hợp lệ.')
+    if (!isStickerId(stickerId)) throw new Error('Sticker không có trong bộ đã duyệt.')
+    if (actorUid !== this.actor.uid) throw new Error('Người chọn sticker không khớp với phiên mẫu hiện tại.')
+    this.refreshFromStorage()
+    const current = this.dayMetadata[dayKey]
+    if (!current || current.provenance === 'legacy-unknown' || !current.firstWriterUserId) throw new Error('Chưa xác định được người viết đầu tiên của ngày này.')
+    if (actorUid !== current.firstWriterUserId) throw new Error('Chỉ người viết đầu tiên được chọn sticker cho ngày này.')
+    if (current.representativeStickerId !== null) throw new Error('Sticker của ngày đã được chọn và được giữ lại trong lịch sử.')
+    const now = new Date().toISOString()
+    const metadata: DayMetadata = { ...current, representativeStickerId: stickerId, stickerAssignedAt: now, stickerUpdatedAt: now }
+    // One localStorage value atomically holds notes and metadata. A new array is
+    // necessary for existing useSyncExternalStore note subscribers to see this change.
+    this.commit([...this.notes], { ...this.dayMetadata, [dayKey]: metadata })
   }
   softDelete(id: string, expectedRevision: number) {
     this.refreshFromStorage()

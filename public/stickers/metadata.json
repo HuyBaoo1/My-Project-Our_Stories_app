@@ -1,0 +1,353 @@
+{
+  "sourceSha256": "ff0b97e4839a9617389de2f7f851efb5bce502fd5620e15b677b605e728f3a5d",
+  "sourceWidth": 675,
+  "sourceHeight": 1200,
+  "algorithm": "original-pixel-visible-rim-ellipse-mask-v1",
+  "stickers": [
+    {
+      "id": "sticker-001",
+      "name": "Ly kem sô-cô-la",
+      "src": "/stickers/sticker-001.png",
+      "thumbnailSrc": "/stickers/thumbs/sticker-001.png",
+      "width": 227,
+      "height": 229,
+      "sourceCrop": [
+        13,
+        61,
+        240,
+        290
+      ],
+      "sourceBounds": [
+        17,
+        65,
+        238,
+        286
+      ],
+      "bytes": 102688,
+      "thumbnailWidth": 95,
+      "thumbnailHeight": 96
+    },
+    {
+      "id": "sticker-002",
+      "name": "Trà túi lọc",
+      "src": "/stickers/sticker-002.png",
+      "thumbnailSrc": "/stickers/thumbs/sticker-002.png",
+      "width": 221,
+      "height": 227,
+      "sourceCrop": [
+        225,
+        53,
+        446,
+        280
+      ],
+      "sourceBounds": [
+        230,
+        57,
+        445,
+        276
+      ],
+      "bytes": 71243,
+      "thumbnailWidth": 93,
+      "thumbnailHeight": 96
+    },
+    {
+      "id": "sticker-003",
+      "name": "Ly trà vàng",
+      "src": "/stickers/sticker-003.png",
+      "thumbnailSrc": "/stickers/thumbs/sticker-003.png",
+      "width": 225,
+      "height": 224,
+      "sourceCrop": [
+        435,
+        53,
+        660,
+        277
+      ],
+      "sourceBounds": [
+        440,
+        56,
+        660,
+        276
+      ],
+      "bytes": 91733,
+      "thumbnailWidth": 96,
+      "thumbnailHeight": 96
+    },
+    {
+      "id": "sticker-004",
+      "name": "Sữa kẹo dẻo",
+      "src": "/stickers/sticker-004.png",
+      "thumbnailSrc": "/stickers/thumbs/sticker-004.png",
+      "width": 227,
+      "height": 226,
+      "sourceCrop": [
+        9,
+        278,
+        236,
+        504
+      ],
+      "sourceBounds": [
+        14,
+        282,
+        232,
+        500
+      ],
+      "bytes": 78429,
+      "thumbnailWidth": 96,
+      "thumbnailHeight": 96
+    },
+    {
+      "id": "sticker-005",
+      "name": "Cà phê đá",
+      "src": "/stickers/sticker-005.png",
+      "thumbnailSrc": "/stickers/thumbs/sticker-005.png",
+      "width": 228,
+      "height": 228,
+      "sourceCrop": [
+        221,
+        270,
+        449,
+        498
+      ],
+      "sourceBounds": [
+        226,
+        275,
+        449,
+        497
+      ],
+      "bytes": 111373,
+      "thumbnailWidth": 96,
+      "thumbnailHeight": 96
+    },
+    {
+      "id": "sticker-006",
+      "name": "Ly đá viên",
+      "src": "/stickers/sticker-006.png",
+      "thumbnailSrc": "/stickers/thumbs/sticker-006.png",
+      "width": 221,
+      "height": 225,
+      "sourceCrop": [
+        437,
+        268,
+        658,
+        493
+      ],
+      "sourceBounds": [
+        440,
+        272,
+        660,
+        494
+      ],
+      "bytes": 60225,
+      "thumbnailWidth": 94,
+      "thumbnailHeight": 96
+    },
+    {
+      "id": "sticker-007",
+      "name": "Lon nước",
+      "src": "/stickers/sticker-007.png",
+      "thumbnailSrc": "/stickers/thumbs/sticker-007.png",
+      "width": 226,
+      "height": 228,
+      "sourceCrop": [
+        11,
+        492,
+        237,
+        720
+      ],
+      "sourceBounds": [
+        14,
+        493,
+        235,
+        719
+      ],
+      "bytes": 95936,
+      "thumbnailWidth": 95,
+      "thumbnailHeight": 96
+    },
+    {
+      "id": "sticker-008",
+      "name": "Cà phê đen",
+      "src": "/stickers/sticker-008.png",
+      "thumbnailSrc": "/stickers/thumbs/sticker-008.png",
+      "width": 225,
+      "height": 226,
+      "sourceCrop": [
+        225,
+        486,
+        450,
+        712
+      ],
+      "sourceBounds": [
+        227,
+        491,
+        445,
+        712
+      ],
+      "bytes": 72022,
+      "thumbnailWidth": 96,
+      "thumbnailHeight": 96
+    },
+    {
+      "id": "sticker-009",
+      "name": "Ly trà xanh",
+      "src": "/stickers/sticker-009.png",
+      "thumbnailSrc": "/stickers/thumbs/sticker-009.png",
+      "width": 228,
+      "height": 225,
+      "sourceCrop": [
+        438,
+        488,
+        666,
+        713
+      ],
+      "sourceBounds": [
+        443,
+        493,
+        663,
+        716
+      ],
+      "bytes": 83445,
+      "thumbnailWidth": 96,
+      "thumbnailHeight": 95
+    },
+    {
+      "id": "sticker-010",
+      "name": "Matcha đá",
+      "src": "/stickers/sticker-010.png",
+      "thumbnailSrc": "/stickers/thumbs/sticker-010.png",
+      "width": 225,
+      "height": 222,
+      "sourceCrop": [
+        10,
+        724,
+        235,
+        946
+      ],
+      "sourceBounds": [
+        15,
+        724,
+        238,
+        946
+      ],
+      "bytes": 81032,
+      "thumbnailWidth": 96,
+      "thumbnailHeight": 95
+    },
+    {
+      "id": "sticker-011",
+      "name": "Cà phê bọt",
+      "src": "/stickers/sticker-011.png",
+      "thumbnailSrc": "/stickers/thumbs/sticker-011.png",
+      "width": 221,
+      "height": 222,
+      "sourceCrop": [
+        227,
+        723,
+        448,
+        945
+      ],
+      "sourceBounds": [
+        232,
+        728,
+        446,
+        945
+      ],
+      "bytes": 101309,
+      "thumbnailWidth": 96,
+      "thumbnailHeight": 96
+    },
+    {
+      "id": "sticker-012",
+      "name": "Ly chanh dây",
+      "src": "/stickers/sticker-012.png",
+      "thumbnailSrc": "/stickers/thumbs/sticker-012.png",
+      "width": 220,
+      "height": 222,
+      "sourceCrop": [
+        446,
+        720,
+        666,
+        942
+      ],
+      "sourceBounds": [
+        444,
+        724,
+        661,
+        944
+      ],
+      "bytes": 75255,
+      "thumbnailWidth": 95,
+      "thumbnailHeight": 96
+    },
+    {
+      "id": "sticker-013",
+      "name": "Ly trà đỏ đá",
+      "src": "/stickers/sticker-013.png",
+      "thumbnailSrc": "/stickers/thumbs/sticker-013.png",
+      "width": 221,
+      "height": 222,
+      "sourceCrop": [
+        2,
+        936,
+        223,
+        1158
+      ],
+      "sourceBounds": [
+        7,
+        938,
+        231,
+        1159
+      ],
+      "bytes": 97727,
+      "thumbnailWidth": 96,
+      "thumbnailHeight": 96
+    },
+    {
+      "id": "sticker-014",
+      "name": "Latte chiếc lá",
+      "src": "/stickers/sticker-014.png",
+      "thumbnailSrc": "/stickers/thumbs/sticker-014.png",
+      "width": 221,
+      "height": 223,
+      "sourceCrop": [
+        224,
+        941,
+        445,
+        1164
+      ],
+      "sourceBounds": [
+        229,
+        944,
+        446,
+        1162
+      ],
+      "bytes": 78197,
+      "thumbnailWidth": 95,
+      "thumbnailHeight": 96
+    },
+    {
+      "id": "sticker-015",
+      "name": "Ly trà trái cây",
+      "src": "/stickers/sticker-015.png",
+      "thumbnailSrc": "/stickers/thumbs/sticker-015.png",
+      "width": 227,
+      "height": 226,
+      "sourceCrop": [
+        444,
+        951,
+        671,
+        1177
+      ],
+      "sourceBounds": [
+        445,
+        953,
+        667,
+        1177
+      ],
+      "bytes": 88371,
+      "thumbnailWidth": 96,
+      "thumbnailHeight": 96
+    }
+  ]
+}

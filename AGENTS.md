@@ -7,7 +7,7 @@ Build an invite-link-based private collaborative diary (calendar-first, text-onl
 ## Strict non-negotiables
 
 1. Firebase **Spark** only. Do not activate billing/Blaze or services requiring billing. Explicit permission required for any spend.
-2. No uploads, no images, no file storage, no Firebase Storage, no Cloud Functions, no App Hosting, no paid extensions.
+2. No user uploads, image database, object storage, Firebase Storage, Cloud Functions, App Hosting or paid extensions. The approved Phase 1 sticker task permits static PNG assets extracted locally from the supplied reference; see `docs/STICKER_PHASE1_PLAN.md` for scope and data contracts.
 3. Stack: Vite + React + TypeScript strict + Firebase Auth + Firestore + Firebase Hosting. No Next.js / FastAPI / server by default.
 4. All content access authorized using tested Firestore Rules: Google login AND active diary membership.
 5. An invite link alone is not a login; Google identity alone is not membership. Require both.

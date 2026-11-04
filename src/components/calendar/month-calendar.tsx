@@ -7,6 +7,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { Button } from '../ui/button'
 import { formatDay, shiftMonth, todayDayKey } from '../../lib/date'
 import type { DaySummary } from '../../types/diary'
+import { CalendarDaySticker } from '../../features/stickers/CalendarDaySticker'
 
 interface Props { month: string; selectedDay: string; summaries: DaySummary[]; onMonth: (day: string) => void; onSelect: (day: string) => void }
 
@@ -33,7 +34,7 @@ export function MonthCalendar({ month, selectedDay, summaries, onMonth, onSelect
         const summary = summaries.find((day) => day.dayKey === dayKey)
         return <button type="button" className={`day-number ${summary ? 'has-memory' : ''}`} aria-label={`Mở ngày ${dayKey}`} aria-current={dayKey === today ? 'date' : undefined} title={summary?.preview} onClick={(event) => { event.stopPropagation(); onSelect(dayKey) }}>
           <span className="calendar-day-digit">{arg.date.getDate()}</span>
-          {summary && <span className="calendar-memory" aria-hidden="true"><span className="memory-emoji">{summary.sticker}</span>{summary.count > 1 && <span className="memory-count">{summary.count}</span>}</span>}
+          {summary && <CalendarDaySticker stickerId={summary.representativeStickerId} noteCount={summary.count} />}
         </button>
       }}
       dateClick={(info) => onSelect(info.dateStr)}
