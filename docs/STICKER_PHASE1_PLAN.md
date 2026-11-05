@@ -17,7 +17,7 @@ Baseline before edits: `cdf4b2ef53a28633be701a019ffda8d2583bc80f`; clean tracked
 - Later notes, edits and soft-delete never transfer attribution or clear a sticker. Metadata remains if all notes are hidden.
 - Persist notes and day metadata in one versioned local envelope so a failed storage write changes neither visible state. Existing v1 arrays must preserve rich text and notes during migration; unknown legacy commit order does not grant invented first-writer rights.
 - Mock commits are synchronous local operations, **not Firestore transactions or an atomic cross-tab database**. Local actor checks are UI/business demonstrations, not authentication/security boundaries.
-- Calendar and day detail resolve the same day-level sticker ID, independent of the author filter. Calendar downloads thumbnails; picker uses thumbnails; day detail can use full image.
+- Calendar and day detail resolve the same day-level sticker ID, independent of the author filter. An assigned day sticker remains visible even if that filter produces zero visible notes; the filter still changes note counts and previews. Calendar downloads thumbnails; picker uses thumbnails; day detail can use full image. Legacy-unknown dates use an unknown-state label rather than promising an available pending selection.
 
 ## Work allocation
 

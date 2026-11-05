@@ -20,6 +20,7 @@ Mở **http://127.0.0.1:5173**. Các trang: `/calendar`, `/day/2026-11-05`, `/jo
 - Thử thêm/sửa/ẩn ghi chú: JSON nằm trong `localStorage`, bản nháp trong `sessionStorage`. Không nhập dữ liệu riêng tư. Xóa dữ liệu trình duyệt có thể làm mất bản mẫu.
 - Revision/conflict/history trong mock chỉ minh họa. Không bảo đảm ghi đồng thời giữa các tab hoặc các thiết bị.
 - Thử tính năng sticker: mở một ngày trống, lưu ghi chú đầu tiên, bấm **Chọn sticker cho ngày**, chọn và xác nhận. Chỉ người viết đầu tiên được chọn một lần; chưa chọn thì để chờ. Sticker xuất hiện trên lịch và trang ngày, vẫn được giữ sau khi ẩn ghi chú đầu tiên. Bản mẫu cũ không có thứ tự lưu đáng tin cậy sẽ không tự cấp quyền chọn.
+- Bộ lọc người viết thay đổi số lượng và preview ghi chú; sticker đã chọn vẫn hiện vì thuộc về ngày chung. Ngày cũ chưa rõ người viết đầu tiên được ghi **Chưa rõ**, không hiển thị như một lựa chọn đang chờ.
 - Bộ 15 sticker chỉ là file tĩnh trong repo; không có upload hoặc lưu ảnh vào database. [Contact sheet](public/stickers/contact-sheet.png) và [ghi chú chất lượng/quyền phân phối](docs/STICKER_ASSETS.md) cần được review trước phát hành.
 - Dữ liệu hư/không đọc được quay về fixture. Dữ liệu mẫu tập trung ở `src/mocks/fixtures.ts`.
 - Chưa có Google login, membership, invite thật, realtime Firestore hoặc backup/restore.
@@ -50,6 +51,7 @@ Lệnh trên chạy Auth (9099), Firestore (8080), Hosting (5000, cần build tr
 - [Ma trận yêu cầu và rủi ro](docs/REQUIREMENTS_MATRIX.md).
 - [Thiết kế lại UI và ảnh QA](docs/UI_REDESIGN.md).
 - [Thiết kế first writer/sticker](docs/FIRST_WRITER_DESIGN.md): phần mock đã triển khai và phần Firestore còn là đề xuất.
+- [Báo cáo sticker Phase 1](docs/STICKER_PHASE1_REPORT.md), [QA](docs/STICKER_QA.md) và [review Standards/Spec](docs/STICKER_REVIEW.md).
 - [Đề xuất schema và Firestore Rules](docs/FIRESTORE_PROPOSAL.md).
 - [Checklist kiểm thử các phase tiếp theo](docs/TESTS_TO_WRITE.md).
 - [Bộ tài liệu handoff gốc](docs/handoff/README.md), được giữ riêng với trạng thái lịch sử ban đầu.

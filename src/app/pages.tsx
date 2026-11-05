@@ -27,11 +27,13 @@ export function CalendarPage() {
   for (const dayKey of monthDays) {
     const visibleNotes = notes.filter((note) => note.dayKey === dayKey && !note.deleted && (!author || note.authorName === author))
     const metadata = store.getDayMetadata(dayKey)
-    if (visibleNotes.length === 0 && (author || !metadata)) continue
+    if (visibleNotes.length === 0 && !metadata?.representativeStickerId && (author || !metadata)) continue
     summaries.push({
       dayKey, count: visibleNotes.length,
-      preview: visibleNotes[0] ? Array.from(plainText(visibleNotes[0].content)).slice(0, 85).join('') : 'Ghi chú đã ẩn; dấu ấn của ngày vẫn được giữ.',
+      preview: visibleNotes[0] ? Array.from(plainText(visibleNotes[0].content)).slice(0, 85).join('')
+        : author ? 'Sticker chung của ngày; không có ghi chú hiển thị cho bộ lọc này.' : 'Ghi chú đã ẩn; dấu ấn của ngày vẫn được giữ.',
       representativeStickerId: metadata?.representativeStickerId ?? null,
+      legacyUnknown: metadata?.provenance === 'legacy-unknown',
     })
   }
   const selectDay = (day: string) => {

@@ -42,6 +42,28 @@ test('first writer selects by keyboard, confirms once and keeps the same sticker
   await expect(page.locator('.first-writer-info')).toContainText('Người viết đầu tiên: Bạn')
   await page.getByRole('link', { name: 'Trở về lịch kỷ niệm', exact: true }).click()
   await expect(page.getByRole('button', { name: `Mở ngày ${day}`, exact: true }).locator('img')).toHaveAttribute('src', '/stickers/thumbs/sticker-002.png')
+  await page.getByRole('button', { name: 'Lọc lịch theo Gia Hân', exact: true }).click()
+  await expect(page.getByRole('button', { name: `Mở ngày ${day}`, exact: true }).locator('img')).toHaveAttribute('src', '/stickers/thumbs/sticker-002.png')
+  await expect(page.locator('.calendar-legend')).toContainText('0 ghi chú')
+})
+
+test('legacy days show unknown attribution instead of a selectable pending state', async ({ page }) => {
+  await page.addInitScript(() => {
+    const legacyNote = {
+      id: 'legacy-note', dayKey: '2024-02-29', authorUid: 'legacy-writer', authorName: 'Người viết cũ',
+      content: { type: 'doc', content: [{ type: 'paragraph', content: [{ type: 'text', text: 'Một ghi chú từ dữ liệu cũ.' }] }] },
+      createdAt: '2024-02-29T05:00:00.000Z', updatedAt: '2024-02-29T05:00:00.000Z',
+      revision: 1, deleted: false, revisions: [],
+    }
+    localStorage.setItem('our-stories:mock-notes:v1', JSON.stringify([legacyNote]))
+  })
+  await page.goto(`/calendar?month=2024-02&day=${day}`)
+  const date = page.getByRole('button', { name: `Mở ngày ${day}`, exact: true })
+  await expect(date.locator('.calendar-sticker-pending')).toContainText('Chưa rõ')
+  await expect(date.locator('.calendar-sticker-pending')).not.toContainText('Chờ chọn')
+  await date.click()
+  await expect(page.locator('.first-writer-info')).toContainText('Chưa xác định người viết đầu tiên từ dữ liệu mẫu cũ.')
+  await expect(page.getByRole('button', { name: 'Chọn sticker cho ngày', exact: true })).toHaveCount(0)
 })
 
 test('pending selection can be cancelled and fixture first writers do not grant another user the picker', async ({ page }) => {

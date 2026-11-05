@@ -25,4 +25,4 @@ export interface DiaryNote {
   deleted: boolean
   revisions: NoteRevision[]
 }
-export interface DaySummary { dayKey: string; count: number; preview: string; representativeStickerId: string | null }
+export interface DaySummary { dayKey: string; count: number; preview: string; representativeStickerId: string | null; legacyUnknown: boolean }

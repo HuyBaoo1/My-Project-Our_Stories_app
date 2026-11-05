@@ -9,11 +9,11 @@ Date: 2026-11-05. Scope: local mock and static assets only, as defined in [STICK
 | `npm test` | Exit 0; 5 files, **50 tests passed** |
 | `npm run typecheck` | Exit 0 |
 | `npm run lint` | Exit 0 |
-| `npm run test:e2e` | Exit 0; **30 passed (1.7m)**, Chromium desktop 1440×1000 and mobile 360×800 |
+| `npm run test:e2e` | Exit 0; **32 passed (1.4m)** in the final review-fix run, Chromium desktop 1440×1000 and mobile 360×800 |
 | `npm run test:rules` | Exit 0; **24 tests passed**, Firestore Emulator Standard deny-all baseline |
 | Original-pixel comparison using local Pillow/NumPy | All 15 full PNG crops retain source RGB at every nontransparent pixel |
 
-The unit count includes 21 existing regression cases, 13 new first-writer/sticker cases and 16 catalog/PNG delivery cases. The browser count includes 20 existing diary cases and 10 new sticker cases (five scenarios on each viewport). **104 automated tests passed across the three suites**, without claiming production Firebase behavior.
+The unit count includes 21 existing regression cases, 13 new first-writer/sticker cases and 16 catalog/PNG delivery cases. The final browser count includes 20 existing diary cases and 12 sticker cases (six scenarios on each viewport). **106 automated tests passed across the three suites**, without claiming production Firebase behavior. After review fixes, root reran lint, typecheck, all 50 unit tests, build and all 32 browser tests; the 24-test emulator result applies to the unchanged deny-all rules and test suite.
 
 Representative actual output:
 
@@ -21,7 +21,7 @@ Representative actual output:
 Test Files  5 passed (5)
      Tests  50 passed (50)
 
-30 passed (1.7m)
+32 passed (1.4m)
 
 Test Files  1 passed (1)
      Tests  24 passed (24)
@@ -43,6 +43,7 @@ The initial unit run had eight failures from the test assuming square 96×96 thu
 - All fifteen full assets and thumbnails decode as RGBA PNGs with transparent pixels, opaque interiors and antialiased alpha. Catalog dimensions match full PNG headers; thumbnails have maximum edge 96; full files remain below 256 KiB and thumbnails below 40 KiB.
 - Keyboard radio selection plus explicit confirmation works in the native dialog. Cancellation leaves selection pending. Image load errors disable the affected option; a delayed image that ultimately fails cannot be saved before loading or after failure.
 - Calendar uses the same selected ID as day detail, including after deleting the only visible note. Picker/page overflow checks pass at both tested widths.
+- A selected author with no visible notes does not hide the assigned shared day sticker; filtered note count correctly becomes zero. Legacy v1 calendar dates display `Chưa rõ` and no picker rather than suggesting an available pending selection.
 - Existing formatting, historical dates, drafts, note revision conflicts, soft-delete/history, month/author filtering and mock-only join regressions passed.
 
 The emulator tests only establish that **all backend operations remain blocked in Phase 1**, including anonymous and nonmember requests to day paths. They do not establish a permissive membership model, first-writer assignment rules, transaction contention correctness or production security.
@@ -56,4 +57,4 @@ Still deferred: actual concurrent Firestore first-note commits, exactly-one-winn
 - `tests/e2e/stickers.spec.ts`
 - This report
 
-No changes to production code, Firestore Rules or existing diary tests were needed by QA. Logs are local ignored artifacts: `artifacts/sticker-qa-e2e.log` and `artifacts/sticker-qa-rules.log`; browser screenshots/traces are under ignored `test-results/`.
+Agent D made no application-source, Firestore Rules or existing diary-test changes. Root later fixed the two review findings and extended the sticker browser suite. Logs are local ignored artifacts: the original `artifacts/sticker-qa-e2e.log`, `artifacts/sticker-qa-rules.log` and final `artifacts/sticker-final-e2e.log`; browser screenshots/traces are under ignored `test-results/`.

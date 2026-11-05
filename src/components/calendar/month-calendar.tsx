@@ -34,7 +34,7 @@ export function MonthCalendar({ month, selectedDay, summaries, onMonth, onSelect
         const summary = summaries.find((day) => day.dayKey === dayKey)
         return <button type="button" className={`day-number ${summary ? 'has-memory' : ''}`} aria-label={`Mở ngày ${dayKey}`} aria-current={dayKey === today ? 'date' : undefined} title={summary?.preview} onClick={(event) => { event.stopPropagation(); onSelect(dayKey) }}>
           <span className="calendar-day-digit">{arg.date.getDate()}</span>
-          {summary && <CalendarDaySticker stickerId={summary.representativeStickerId} noteCount={summary.count} />}
+          {summary && <CalendarDaySticker stickerId={summary.representativeStickerId} noteCount={summary.count} legacyUnknown={summary.legacyUnknown} />}
         </button>
       }}
       dateClick={(info) => onSelect(info.dateStr)}
