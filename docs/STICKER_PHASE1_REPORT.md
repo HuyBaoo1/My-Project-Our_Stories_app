@@ -40,6 +40,8 @@ Review kiến trúc độc lập ban đầu chưa thấy Critical/High. Một Me
 
 Review hai trục sau commit tích hợp phát hiện thêm một Medium (bộ lọc người viết làm mất sticker chung của ngày) và một Low (ngày legacy-unknown vẫn ghi `Chờ chọn`). Đã sửa: sticker đã gán luôn được giữ khi lọc, số note/preview vẫn theo bộ lọc; ngày legacy hiển thị `Chưa rõ`. Hai tình huống được kiểm thử trên cả viewport và toàn bộ 32 browser tests đã qua. Kết quả Standards/Spec được ghi riêng trong [STICKER_REVIEW.md](STICKER_REVIEW.md).
 
+Hai reviewer đã xác nhận lại commit code `404d997`: Standards không có finding; hai finding Spec đều đóng, không có Critical/High mới hoặc finding còn mở trong phạm vi này. Báo cáo review không coi mock/emulator deny-all là chứng minh bảo mật hoặc contention Firestore thật.
+
 Các agent thật đã tham gia theo wave: A asset extraction, B UI, C business/data design, D QA và E independent review. Không mô phỏng agent hoặc chạy năm child đồng thời khi môi trường chỉ có bốn slots gồm root.
 
 Ảnh duyệt UI local (gitignored `artifacts/`): `sticker-calendar-desktop.png`, `sticker-calendar-mobile.png`, `sticker-day-mobile.png`, `sticker-picker-desktop.png`, `sticker-picker-mobile.png`. Contact sheet đi cùng bộ assets: `public/stickers/contact-sheet.png`.

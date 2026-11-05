@@ -6,6 +6,8 @@ Ngày thực hiện: **2026-11-05**, múi giờ `Asia/Ho_Chi_Minh`.
 
 **Cập nhật sticker:** tiếp tục Phase 1 theo yêu cầu mới, thêm 15 static PNG và luồng chọn sticker/người viết đầu tiên trong mock. Phạm vi và interface được ghi ở [STICKER_PHASE1_PLAN.md](docs/STICKER_PHASE1_PLAN.md); thiết kế Firebase tương lai ở [FIRST_WRITER_DESIGN.md](docs/FIRST_WRITER_DESIGN.md), không thay rules deny-all hoặc kết nối Firebase thật.
 
+Báo cáo sticker cuối: [STICKER_PHASE1_REPORT.md](docs/STICKER_PHASE1_REPORT.md), với 106 tests đã qua và [review hai trục](docs/STICKER_REVIEW.md) đã xử lý các finding trong phạm vi Phase 1. Các số liệu 63 tests bên dưới là lịch sử của lần scaffold ban đầu.
+
 **Kết quả:** đã triển khai skeleton và giao diện mock của Phase 1; lint, strict typecheck, build và 63 automated tests đã qua. **DỪNG để duyệt**, chưa chuyển sang Phase 2. Phase 0 đã có ma trận yêu cầu, quyết định UI và đề xuất schema/rules; thiết kế bảo mật vẫn cần review, chưa được xem là đã nghiệm thu.
 
 ## Đã hoàn thành
