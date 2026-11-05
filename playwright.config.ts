@@ -10,6 +10,7 @@ export default defineConfig({
   projects: [
     { name: 'desktop', use: { ...devices['Desktop Chrome'], viewport: { width: 1440, height: 1000 } } },
     { name: 'mobile', use: { ...devices['Desktop Chrome'], viewport: { width: 360, height: 800 }, isMobile: true, hasTouch: true } },
+    { name: 'webkit-stickers', testMatch: '**/personal-stickers.spec.ts', use: { ...devices['iPhone 13'], browserName: 'webkit' } },
   ],
   webServer: { command: 'npm run dev', url: 'http://127.0.0.1:5173', reuseExistingServer: !process.env.CI },
 })

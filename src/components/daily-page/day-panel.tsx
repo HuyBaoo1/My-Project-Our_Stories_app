@@ -10,6 +10,7 @@ import type { DiaryNote } from '../../types/diary'
 import { MOCK_MEMBER } from '../../mocks/fixtures'
 import { DailyStickerBadge } from '../../features/stickers/DailyStickerBadge'
 import { StickerPicker } from '../../features/stickers/StickerPicker'
+import { isPersonalStickerId } from '../../features/stickers/sticker-reference'
 
 interface Props { dayKey: string; fullPage?: boolean; initialCompose?: boolean; onSelectDay: (day: string) => void }
 
@@ -83,7 +84,11 @@ export function DayPanel({ dayKey, fullPage = false, initialCompose = false, onS
       <div className="day-ending"><span /><Feather size={15} /><span /></div>
       <p className="day-caption">Mỗi dòng viết, một chút gần nhau hơn.</p>
     </div>
-    {stickerPickerOpen && <StickerPicker onConfirm={(id) => { store.assignDaySticker(dayKey, id, MOCK_MEMBER.uid); setSaved(true) }} onClose={() => setStickerPickerOpen(false)} />}
+    {stickerPickerOpen && <StickerPicker onConfirm={async (id) => {
+      if (isPersonalStickerId(id)) await store.assignPersonalDaySticker(dayKey, id, MOCK_MEMBER.uid)
+      else store.assignDaySticker(dayKey, id, MOCK_MEMBER.uid)
+      setSaved(true)
+    }} onClose={() => setStickerPickerOpen(false)} />}
     {deleting && <DeleteConfirmation onClose={() => setDeleting(null)} onConfirm={() => {
         try { store.softDelete(deleting.id, deleting.revision); setDeleting(null); setError('') } catch (failure) { setError(failure instanceof Error ? failure.message : 'Không ẩn được ghi chú.'); setDeleting(null) }
       }} />}

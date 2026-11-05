@@ -84,3 +84,36 @@
   .sticker-selected-image { width: 27px; height: 27px; }
 }
 @media (prefers-reduced-motion: reduce) { .sticker-image img { transition: none; } }
+
+.sticker-source-tabs { display: flex; gap: 5px; padding: 4px; background: #eeeef7; border-radius: 13px; margin: 0 0 19px; }
+.sticker-source-tabs button { flex: 1; padding: 10px 12px; border: 0; border-radius: 9px; background: transparent; color: #7c85ae; font-size: 12px; font-weight: 600; }
+.sticker-source-tabs button[aria-selected='true'] { background: #fffefa; color: var(--primary); box-shadow: 0 2px 5px #222c6710; }
+.personal-import-actions { display: flex; gap: 9px; flex-wrap: wrap; margin-bottom: 13px; }
+.personal-import-actions button { flex: 1; font-size: 11px; padding: 0 10px; border-radius: 11px; }
+.personal-import-actions button svg { width: 16px; height: 16px; }
+.personal-sticker-input { min-height: 100px; border: 1px dashed #8999da; border-radius: 13px; background: #f1f3ff; padding: 18px 13px; outline: none; font-size: 28px; line-height: 1.8; overflow-wrap: anywhere; color: var(--primary); }
+.personal-sticker-input:focus { border-style: solid; box-shadow: 0 0 0 3px #dfe5ff; }
+.personal-sticker-input:empty::before { content: attr(data-placeholder); font-size: 12px; line-height: 1.8; color: #8590bc; pointer-events: none; display: block; }
+.personal-input-help { color: #747da3; font-size: 11px; line-height: 1.85; margin-top: 12px; }
+.personal-input-limits { color: #9399b2; font-size: 9px; line-height: 1.8; margin-top: 7px; }
+.personal-import-progress { display: block; color: var(--primary); background: #eef1fc; border-radius: 8px; font-size: 11px; padding: 10px; margin-top: 12px; }
+.personal-library-title { font-size: 12px; font-weight: 600; margin: 22px 0 12px; }
+.personal-library-title span { font-size: 10px; background: #e5e9ff; padding: 3px 7px; border-radius: 9px; margin-left: 5px; }
+.personal-library-empty { color: #9097b3; font-size: 11px; line-height: 1.85; padding: 17px; border: 1px dashed #d9ddec; border-radius: 11px; text-align: center; }
+.personal-library-option[aria-pressed='true'] { background: #e9edff; border-color: #7b8ad9; }
+.personal-library-option:disabled { opacity: .55; }
+.personal-library-placeholder { width: 60px; height: 60px; display: grid; place-items: center; font-size: 8px; color: #969db9; }
+.personal-selection-emoji { font-size: 29px; line-height: 1.3; }
+.personal-sticker-emoji { display: grid; place-items: center; flex-shrink: 0; }
+.calendar-sticker-emoji { font-size: 39px; line-height: 1; width: 49px; height: 49px; }
+.daily-sticker-emoji { font-size: 46px; width: 65px; height: 65px; }
+.day-page .daily-sticker-emoji { font-size: 59px; width: 82px; height: 82px; }
+@media (max-width: 767px) {
+  .personal-import-actions { gap: 7px; }
+  .personal-import-actions button { font-size: 9px; gap: 5px; padding: 0 7px; }
+  .personal-import-actions button svg { width: 13px; height: 13px; }
+  .sticker-source-tabs button { font-size: 11px; padding: 9px; }
+  .personal-input-help { font-size: 10px; }
+  .calendar-sticker-emoji { font-size: 28px; width: 32px; height: 32px; }
+  .day-page .daily-sticker-emoji { font-size: 43px; width: 60px; height: 60px; }
+}

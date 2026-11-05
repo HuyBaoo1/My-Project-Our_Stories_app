@@ -1,13 +1,13 @@
 import { isDayKey } from '../../lib/date'
 import type { DiaryNote } from '../../types/diary'
-import { isStickerId, type StickerId } from './stickerCatalog'
+import { isStickerReferenceId } from './sticker-reference'
 
 export interface DayMetadata {
   readonly dayKey: string
   readonly firstWriterUserId: string | null
   readonly firstWriterDisplayName: string | null
   readonly firstNoteId: string | null
-  readonly representativeStickerId: StickerId | null
+  readonly representativeStickerId: string | null
   readonly stickerAssignedAt: string | null
   readonly stickerUpdatedAt: string | null
   readonly provenance: 'local-commit' | 'fixture-order' | 'legacy-unknown'
@@ -67,7 +67,7 @@ function parseDayMetadata(input: unknown, dayKey: string, notes: DiaryNote[]): D
   const sticker = value.representativeStickerId
   if (sticker === null) {
     if (value.stickerAssignedAt !== null || value.stickerUpdatedAt !== null) return undefined
-  } else if (!isStickerId(sticker) || !validTimestamp(value.stickerAssignedAt) || value.stickerAssignedAt !== value.stickerUpdatedAt) return undefined
+  } else if (!isStickerReferenceId(sticker) || !validTimestamp(value.stickerAssignedAt) || value.stickerAssignedAt !== value.stickerUpdatedAt) return undefined
   return {
     dayKey,
     firstWriterUserId: firstNote.authorUid,

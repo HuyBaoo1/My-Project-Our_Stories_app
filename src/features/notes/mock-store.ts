@@ -3,6 +3,8 @@ import { parseRichText, plainText } from '../../lib/rich-text'
 import { createMockNotes, MOCK_MEMBER } from '../../mocks/fixtures'
 import type { DiaryNote, RichDocument } from '../../types/diary'
 import { isStickerId } from '../stickers/stickerCatalog'
+import { getStickerEmoji, isPersonalStickerId } from '../stickers/sticker-reference'
+import { getPersonalSticker } from '../stickers/personal-stickers'
 import { metadataForExistingNotes, metadataForFirstNote, parseDayMetadataMap, type DayMetadata, type DayMetadataMap, type MockActor } from '../stickers/day-metadata'
 
 export const MOCK_STORAGE_KEY = 'our-stories:mock-notes:v1'
@@ -110,14 +112,29 @@ export class MockDiaryStore {
     return updated
   }
   assignDaySticker(dayKey: string, stickerId: string, actorUid: string): void {
+    if (!isStickerId(stickerId) && !getStickerEmoji(stickerId)) throw new Error('Sticker hoặc emoji không hợp lệ.')
+    this.commitDaySticker(dayKey, stickerId, actorUid)
+  }
+  async assignPersonalDaySticker(dayKey: string, stickerId: string, actorUid: string): Promise<void> {
+    if (!isPersonalStickerId(stickerId)) throw new Error('Sticker cá nhân không hợp lệ.')
+    this.requireFirstWriter(dayKey, actorUid)
+    const sticker = await getPersonalSticker(stickerId)
+    if (!sticker) throw new Error('Không tìm thấy ảnh sticker trên thiết bị này. Hãy thêm lại ảnh trước khi lưu.')
+    // Recheck after the asynchronous image lookup; another selection may have committed.
+    this.commitDaySticker(dayKey, stickerId, actorUid)
+  }
+  private requireFirstWriter(dayKey: string, actorUid: string): DayMetadata {
     if (!isDayKey(dayKey)) throw new Error('Ngày không hợp lệ.')
-    if (!isStickerId(stickerId)) throw new Error('Sticker không có trong bộ đã duyệt.')
     if (actorUid !== this.actor.uid) throw new Error('Người chọn sticker không khớp với phiên mẫu hiện tại.')
     this.refreshFromStorage()
     const current = this.dayMetadata[dayKey]
     if (!current || current.provenance === 'legacy-unknown' || !current.firstWriterUserId) throw new Error('Chưa xác định được người viết đầu tiên của ngày này.')
     if (actorUid !== current.firstWriterUserId) throw new Error('Chỉ người viết đầu tiên được chọn sticker cho ngày này.')
     if (current.representativeStickerId !== null) throw new Error('Sticker của ngày đã được chọn và được giữ lại trong lịch sử.')
+    return current
+  }
+  private commitDaySticker(dayKey: string, stickerId: string, actorUid: string): void {
+    const current = this.requireFirstWriter(dayKey, actorUid)
     const now = new Date().toISOString()
     const metadata: DayMetadata = { ...current, representativeStickerId: stickerId, stickerAssignedAt: now, stickerUpdatedAt: now }
     // One localStorage value atomically holds notes and metadata. A new array is

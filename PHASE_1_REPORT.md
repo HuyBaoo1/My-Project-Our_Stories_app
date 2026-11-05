@@ -2,6 +2,8 @@
 
 Ngày thực hiện: **2026-11-05**, múi giờ `Asia/Ho_Chi_Minh`.
 
+**Cập nhật 2026-11-06 — sticker cá nhân:** bộ chọn mặc định nhận ảnh dán, ảnh từ thiết bị hoặc emoji; bộ PNG mẫu chuyển sang tab riêng. Ảnh chỉ lưu IndexedDB local, chưa đồng bộ. Lint, typecheck, build, **72 unit tests và 59 browser tests** đã qua trong lượt cập nhật này. Xem [phạm vi, kết quả và giới hạn iPhone](docs/PERSONAL_STICKERS_PHASE1.md). Vẫn Phase 1, chờ duyệt UI. Báo cáo và review catalog bên dưới ghi lại phiên bản trước, không bao gồm thay đổi sticker cá nhân.
+
 **Cập nhật UI:** giao diện đầu tiên chưa được chủ repo duyệt. Giao diện đã được thiết kế lại theo reference CapLog; trạng thái vẫn **chờ duyệt UI**, chưa được phép sang Phase 2. Kết quả và ảnh kiểm tra mới nằm trong [UI_REDESIGN.md](docs/UI_REDESIGN.md). Các số liệu kiểm tra bên dưới ghi lại lượt triển khai Phase 1 ban đầu.
 
 **Cập nhật sticker:** tiếp tục Phase 1 theo yêu cầu mới, thêm 15 static PNG và luồng chọn sticker/người viết đầu tiên trong mock. Phạm vi và interface được ghi ở [STICKER_PHASE1_PLAN.md](docs/STICKER_PHASE1_PLAN.md); thiết kế Firebase tương lai ở [FIRST_WRITER_DESIGN.md](docs/FIRST_WRITER_DESIGN.md), không thay rules deny-all hoặc kết nối Firebase thật.
