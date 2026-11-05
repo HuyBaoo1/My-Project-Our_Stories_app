@@ -18,6 +18,7 @@ Build an invite-link-based private collaborative diary (calendar-first, text-onl
 10. Secrets, tokens, private diary content, service-account keys and member PII must not appear in logs, prompts, commits or examples.
 11. No deploy, production resource mutation, paid service, destructive command or admin credential action without explicit owner approval.
 12. Every 'complete' claim requires actual executed tests and their outputs. Label mock, proposed and not-yet-tested explicitly.
+13. **Keep the UI simple.** Sticker selection has two choices: add a sticker for the current day or choose an existing sample. Custom stickers belong to that day only; do not build a reusable sticker library, collection management or a separate save-to-pack flow. Persist only the image needed to display a confirmed day sticker after reload.
 
 ## Development cadence
 

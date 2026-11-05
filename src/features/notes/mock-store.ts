@@ -4,7 +4,7 @@ import { createMockNotes, MOCK_MEMBER } from '../../mocks/fixtures'
 import type { DiaryNote, RichDocument } from '../../types/diary'
 import { isStickerId } from '../stickers/stickerCatalog'
 import { getStickerEmoji, isPersonalStickerId } from '../stickers/sticker-reference'
-import { getPersonalSticker } from '../stickers/personal-stickers'
+import { discardDayStickerImage, saveDayStickerImage, type PersonalSticker } from '../stickers/personal-stickers'
 import { metadataForExistingNotes, metadataForFirstNote, parseDayMetadataMap, type DayMetadata, type DayMetadataMap, type MockActor } from '../stickers/day-metadata'
 
 export const MOCK_STORAGE_KEY = 'our-stories:mock-notes:v1'
@@ -115,13 +115,17 @@ export class MockDiaryStore {
     if (!isStickerId(stickerId) && !getStickerEmoji(stickerId)) throw new Error('Sticker hoặc emoji không hợp lệ.')
     this.commitDaySticker(dayKey, stickerId, actorUid)
   }
-  async assignPersonalDaySticker(dayKey: string, stickerId: string, actorUid: string): Promise<void> {
-    if (!isPersonalStickerId(stickerId)) throw new Error('Sticker cá nhân không hợp lệ.')
+  async assignPersonalDaySticker(dayKey: string, sticker: PersonalSticker, actorUid: string): Promise<void> {
+    if (!isPersonalStickerId(sticker.id)) throw new Error('Sticker cá nhân không hợp lệ.')
     this.requireFirstWriter(dayKey, actorUid)
-    const sticker = await getPersonalSticker(stickerId)
-    if (!sticker) throw new Error('Không tìm thấy ảnh sticker trên thiết bị này. Hãy thêm lại ảnh trước khi lưu.')
-    // Recheck after the asynchronous image lookup; another selection may have committed.
-    this.commitDaySticker(dayKey, stickerId, actorUid)
+    await saveDayStickerImage(sticker)
+    try {
+      // Recheck after the async image write before assigning the day.
+      this.commitDaySticker(dayKey, sticker.id, actorUid)
+    } catch (failure) {
+      await discardDayStickerImage(sticker.id).catch(() => { /* Preserve the original save error. */ })
+      throw failure
+    }
   }
   private requireFirstWriter(dayKey: string, actorUid: string): DayMetadata {
     if (!isDayKey(dayKey)) throw new Error('Ngày không hợp lệ.')

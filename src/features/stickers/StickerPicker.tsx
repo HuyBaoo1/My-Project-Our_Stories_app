@@ -6,9 +6,10 @@ import { StickerImage } from './StickerImage'
 import { PersonalStickerInput } from './PersonalStickerInput'
 import { getStickerEmoji } from './sticker-reference'
 import { useResolvedSticker } from './use-resolved-sticker'
+import type { PersonalSticker } from './personal-stickers'
 
 interface Props {
-  onConfirm: (id: string) => void | Promise<void>
+  onConfirm: (id: string, draft?: PersonalSticker | null) => void | Promise<void>
   onClose: () => void
 }
 
@@ -17,16 +18,17 @@ export function StickerPicker({ onConfirm, onClose }: Props) {
   const labelId = useId()
   const [tab, setTab] = useState<'personal' | 'samples'>('personal')
   const [selectedId, setSelectedId] = useState<string | null>(null)
+  const [draft, setDraft] = useState<PersonalSticker | null>(null)
   const [loadedIds, setLoadedIds] = useState<Set<string>>(() => new Set())
   const [failedIds, setFailedIds] = useState<Set<string>>(() => new Set())
   const [error, setError] = useState('')
   const [saving, setSaving] = useState(false)
-  const selected = useResolvedSticker(selectedId)
+  const selected = useResolvedSticker(selectedId, draft)
   const selectedImageFailed = !!selectedId && (failedIds.has(selectedId) || selected.status === 'missing')
   const selectedImageLoaded = !!selectedId && (!!getStickerEmoji(selectedId) || loadedIds.has(selectedId))
   const imageLoaded = (id: string) => setLoadedIds((previous) => new Set(previous).add(id))
   const imageFailed = (id: string) => setFailedIds((previous) => new Set(previous).add(id))
-  const changeTab = (next: 'personal' | 'samples') => { setTab(next); setSelectedId(null); setError('') }
+  const changeTab = (next: 'personal' | 'samples') => { setTab(next); setSelectedId(null); setDraft(null); setError('') }
 
   useEffect(() => {
     const dialog = dialogRef.current
@@ -39,7 +41,7 @@ export function StickerPicker({ onConfirm, onClose }: Props) {
     setSaving(true)
     setError('')
     try {
-      await onConfirm(selectedId)
+      await onConfirm(selectedId, draft)
       setSaving(false)
       onClose()
     } catch (failure) {
@@ -54,7 +56,7 @@ export function StickerPicker({ onConfirm, onClose }: Props) {
       <div><p className="daily-sticker-eyebrow">MỘT DẤU NHỚ, CHO MỘT NGÀY</p><h2 id={`${labelId}-title`}>Chọn sticker cho ngày</h2></div>
       <Button type="button" variant="ghost" size="icon" aria-label="Đóng bộ chọn sticker" disabled={saving} onClick={onClose}><X /></Button>
     </div>
-    <p id={`${labelId}-description`} className="sticker-picker-description">Một dấu nhớ của riêng bạn: dán sticker đã cắt, chọn ảnh từ thiết bị hoặc nhập emoji. Người viết đầu tiên xác nhận một lần cho ngày này.</p>
+    <p id={`${labelId}-description`} className="sticker-picker-description">Tự thêm một sticker hoặc chọn hình có sẵn cho ngày này.</p>
     <div role="tablist" tabIndex={-1} aria-label="Nguồn sticker" className="sticker-source-tabs" onKeyDown={(event) => {
       if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
         event.preventDefault()
@@ -62,11 +64,11 @@ export function StickerPicker({ onConfirm, onClose }: Props) {
         changeTab(next); document.getElementById(`${labelId}-${next}-tab`)?.focus()
       }
     }}>
-      <button type="button" role="tab" id={`${labelId}-personal-tab`} aria-controls={`${labelId}-personal-panel`} aria-selected={tab === 'personal'} tabIndex={tab === 'personal' ? 0 : -1} disabled={saving} onClick={() => changeTab('personal')}>Sticker của bạn</button>
-      <button type="button" role="tab" id={`${labelId}-samples-tab`} aria-controls={`${labelId}-samples-panel`} aria-selected={tab === 'samples'} tabIndex={tab === 'samples' ? 0 : -1} disabled={saving} onClick={() => changeTab('samples')}>Bộ mẫu</button>
+      <button type="button" role="tab" id={`${labelId}-personal-tab`} aria-controls={`${labelId}-personal-panel`} aria-selected={tab === 'personal'} tabIndex={tab === 'personal' ? 0 : -1} disabled={saving} onClick={() => changeTab('personal')}>Tự thêm</button>
+      <button type="button" role="tab" id={`${labelId}-samples-tab`} aria-controls={`${labelId}-samples-panel`} aria-selected={tab === 'samples'} tabIndex={tab === 'samples' ? 0 : -1} disabled={saving} onClick={() => changeTab('samples')}>Có sẵn</button>
     </div>
     {tab === 'personal' ? <div role="tabpanel" id={`${labelId}-personal-panel`} aria-labelledby={`${labelId}-personal-tab`}>
-      <PersonalStickerInput selectedId={selectedId} disabled={saving} onSelect={(id) => { setSelectedId(id); setError('') }} onImageLoaded={imageLoaded} onImageFailed={imageFailed} />
+      <PersonalStickerInput disabled={saving} onSelect={(id, image) => { setSelectedId(id); setDraft(image ?? null); setError('') }} />
     </div> : <div role="tabpanel" id={`${labelId}-samples-panel`} aria-labelledby={`${labelId}-samples-tab`}>
     <fieldset className="sticker-picker-fieldset" disabled={saving}>
       <legend>Bộ sưu tập đồ uống · {stickerCatalog.length} sticker</legend>
@@ -88,8 +90,7 @@ export function StickerPicker({ onConfirm, onClose }: Props) {
       <div className="sticker-picker-selection" aria-live="polite">{selectedId ? <>
         {selected.emoji ? <span className="personal-selection-emoji">{selected.emoji}</span> : selected.thumbnailSrc ? <StickerImage src={selected.thumbnailSrc} alt="" className="sticker-selected-image" onLoadSuccess={() => imageLoaded(selectedId)} onLoadError={() => imageFailed(selectedId)} /> : null}
         <span>{selectedImageFailed ? 'Ảnh chưa tải được' : selected.name}</span></> : <span>Chưa chọn sticker</span>}</div>
-      <Button type="button" className="sticker-confirm-button" disabled={!selectedId || !selectedImageLoaded || selectedImageFailed || saving} onClick={() => { void confirm() }}><Check />{saving ? 'Đang lưu…' : 'Lưu sticker'}</Button>
+      <Button type="button" className="sticker-confirm-button" disabled={!selectedId || !selectedImageLoaded || selectedImageFailed || saving} onClick={() => { void confirm() }}><Check />{saving ? 'Đang lưu…' : 'Dùng sticker'}</Button>
     </div>
-    <p className="sticker-picker-local-note">Bản thử nghiệm · chỉ lưu trên trình duyệt này. Chỉ chọn một lần cho mỗi ngày.</p>
   </dialog>
 }

@@ -10,9 +10,24 @@ async function openPersonalPicker(page: Page, selectedDay = day) {
 
 test.beforeEach(async ({ page }) => { await page.clock.setFixedTime(new Date('2026-11-06T03:00:00Z')) })
 
+async function storedImageCount(page: Page) {
+  return page.evaluate(() => new Promise<number>((resolve, reject) => {
+    const request = indexedDB.open('our-stories-personal-stickers', 1)
+    request.onupgradeneeded = () => request.result.createObjectStore('images', { keyPath: 'id' })
+    request.onerror = () => reject(request.error)
+    request.onsuccess = () => {
+      const database = request.result
+      const transaction = database.transaction('images', 'readonly')
+      const count = transaction.objectStore('images').count()
+      transaction.oncomplete = () => { database.close(); resolve(count.result) }
+      transaction.onabort = () => { database.close(); reject(transaction.error) }
+    }
+  }))
+}
+
 test('first writer can open personal sticker entry instead of a fixed-only catalog', async ({ page }) => {
   await openPersonalPicker(page)
-  await expect(page.getByRole('tab', { name: 'Sticker của bạn', exact: true })).toHaveAttribute('aria-selected', 'true')
+  await expect(page.getByRole('tab', { name: 'Tự thêm', exact: true })).toHaveAttribute('aria-selected', 'true')
   await expect(page.getByRole('textbox', { name: 'Dán sticker hoặc nhập emoji' })).toBeVisible()
   await expect(page.getByRole('button', { name: 'Chọn ảnh từ thiết bị', exact: true })).toBeVisible()
 })
@@ -20,7 +35,7 @@ test('first writer can open personal sticker entry instead of a fixed-only catal
 test('keyboard emoji is explicitly saved and shown on the day and calendar after reload', async ({ page }) => {
   await openPersonalPicker(page)
   await page.getByRole('textbox', { name: 'Dán sticker hoặc nhập emoji' }).fill('🌿')
-  await page.getByRole('button', { name: 'Lưu sticker', exact: true }).click()
+  await page.getByRole('button', { name: 'Dùng sticker', exact: true }).click()
   await expect(page.locator('.daily-sticker-emoji')).toHaveText('🌿')
   await page.reload()
   await expect(page.locator('.daily-sticker-emoji')).toHaveText('🌿')
@@ -38,9 +53,9 @@ test('pasted image is stored locally and survives reload with the same day and c
     data.items.add(new File([blob], 'cut-subject.png', { type: 'image/png' }))
     element.dispatchEvent(new ClipboardEvent('paste', { clipboardData: data, bubbles: true, cancelable: true }))
   })
-  await expect(page.locator('.personal-library-option')).toHaveCount(1)
-  await expect(page.getByRole('button', { name: 'Lưu sticker', exact: true })).toBeEnabled()
-  await page.getByRole('button', { name: 'Lưu sticker', exact: true }).click()
+  await expect(page.getByRole('button', { name: 'Dùng sticker', exact: true })).toBeEnabled()
+  expect(await storedImageCount(page)).toBe(0)
+  await page.getByRole('button', { name: 'Dùng sticker', exact: true }).click()
   await expect(page.locator('.daily-sticker-badge')).toHaveAttribute('data-sticker-id', /^personal-/)
   const reference = await page.locator('.daily-sticker-badge').getAttribute('data-sticker-id')
   expect(reference).toMatch(/^personal-/)
@@ -54,16 +69,18 @@ test('pasted image is stored locally and survives reload with the same day and c
   expect(external).toEqual([])
 })
 
-test('device image fallback populates a reusable personal library', async ({ page }) => {
+test('device image belongs only to its confirmed day and is not offered on another day', async ({ page }) => {
   await openPersonalPicker(page)
   await page.getByLabel('Ảnh sticker từ thiết bị').setInputFiles('public/stickers/sticker-015.png')
-  await expect(page.locator('.personal-library-option')).toHaveCount(1)
-  await page.getByRole('button', { name: 'Lưu sticker', exact: true }).click()
-  await openPersonalPicker(page, '2024-03-01')
-  await expect(page.locator('.personal-library-option')).toHaveCount(1)
-  await page.getByRole('button', { name: 'Chọn sticker cá nhân 1', exact: true }).click()
-  await page.getByRole('button', { name: 'Lưu sticker', exact: true }).click()
+  await expect(page.getByRole('button', { name: 'Dùng sticker', exact: true })).toBeEnabled()
+  await page.getByRole('button', { name: 'Dùng sticker', exact: true }).click()
   await expect(page.locator('.daily-sticker-image[data-image-state="loaded"]')).toBeVisible()
+  expect(await storedImageCount(page)).toBe(1)
+  await openPersonalPicker(page, '2024-03-01')
+  await expect(page.locator('.personal-library-option')).toHaveCount(0)
+  await expect(page.getByRole('button', { name: 'Dùng sticker', exact: true })).toBeDisabled()
+  await page.getByRole('tab', { name: 'Có sẵn', exact: true }).click()
+  await expect(page.locator('.sticker-option')).toHaveCount(15)
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
 })
 
@@ -81,15 +98,15 @@ test('native image insertion is accepted without requiring a file-input event', 
     element.append(image)
     element.dispatchEvent(new InputEvent('input', { bubbles: true, inputType: 'insertFromPaste' }))
   })
-  await expect(page.locator('.personal-library-option')).toHaveCount(1)
-  await page.getByRole('button', { name: 'Lưu sticker', exact: true }).click()
+  await expect(page.getByRole('button', { name: 'Dùng sticker', exact: true })).toBeEnabled()
+  await page.getByRole('button', { name: 'Dùng sticker', exact: true }).click()
   await expect(page.locator('.daily-sticker-image[data-image-state="loaded"]')).toBeVisible()
 })
 
-test('metadata save failure keeps the imported image reusable without assigning the day', async ({ page }) => {
+test('metadata save failure keeps the preview for retry and removes the unattached stored image', async ({ page }) => {
   await openPersonalPicker(page)
   await page.getByLabel('Ảnh sticker từ thiết bị').setInputFiles('public/stickers/sticker-014.png')
-  await expect(page.getByRole('button', { name: 'Lưu sticker', exact: true })).toBeEnabled()
+  await expect(page.getByRole('button', { name: 'Dùng sticker', exact: true })).toBeEnabled()
   await page.evaluate(() => {
     const original = Storage.prototype.setItem
     Storage.prototype.setItem = function (key: string, value: string) {
@@ -97,14 +114,16 @@ test('metadata save failure keeps the imported image reusable without assigning 
       original.call(this, key, value)
     }
   })
-  await page.getByRole('button', { name: 'Lưu sticker', exact: true }).click()
+  await page.getByRole('button', { name: 'Dùng sticker', exact: true }).click()
   await expect(page.getByRole('alert')).toContainText('Personal sticker metadata quota failure')
-  await expect(page.locator('.personal-library-option')).toHaveCount(1)
+  await expect(page.locator('.sticker-selected-image[data-image-state="loaded"]')).toBeVisible()
+  expect(await storedImageCount(page)).toBe(0)
   await page.getByRole('button', { name: 'Đóng bộ chọn sticker', exact: true }).click()
   await expect(page.locator('.daily-sticker-badge')).not.toHaveAttribute('data-sticker-id', /personal-/)
   await page.reload()
   await page.getByRole('button', { name: 'Chọn sticker cho ngày', exact: true }).click()
-  await expect(page.locator('.personal-library-option')).toHaveCount(1)
+  await expect(page.getByRole('button', { name: 'Dùng sticker', exact: true })).toBeDisabled()
+  expect(await storedImageCount(page)).toBe(0)
 })
 
 test('unsupported images and external HTML are rejected without importing remote content', async ({ page }) => {
@@ -120,7 +139,7 @@ test('unsupported images and external HTML are rejected without importing remote
   await page.getByLabel('Ảnh sticker từ thiết bị').setInputFiles({ name: 'fake.png', mimeType: 'image/png', buffer: Buffer.from('<svg xmlns="http://www.w3.org/2000/svg"></svg>') })
   await expect(page.getByRole('alert')).toContainText('Chỉ nhận ảnh PNG')
   await expect(page.locator('.personal-library-option')).toHaveCount(0)
-  await expect(page.getByRole('button', { name: 'Lưu sticker', exact: true })).toBeDisabled()
+  await expect(page.getByRole('button', { name: 'Dùng sticker', exact: true })).toBeDisabled()
   expect(external).toEqual([])
 })
 
@@ -128,17 +147,35 @@ test('unavailable device storage does not claim image success and still permits 
   await page.addInitScript(() => Object.defineProperty(window, 'indexedDB', { configurable: true, value: undefined }))
   await openPersonalPicker(page)
   await page.getByLabel('Ảnh sticker từ thiết bị').setInputFiles('public/stickers/sticker-014.png')
+  await expect(page.getByRole('button', { name: 'Dùng sticker', exact: true })).toBeEnabled()
+  await page.getByRole('button', { name: 'Dùng sticker', exact: true }).click()
   await expect(page.getByRole('alert')).toContainText('Trình duyệt không cho lưu sticker')
-  await expect(page.getByRole('button', { name: 'Lưu sticker', exact: true })).toBeDisabled()
   await page.getByRole('textbox', { name: 'Dán sticker hoặc nhập emoji' }).fill('💛')
-  await page.getByRole('button', { name: 'Lưu sticker', exact: true }).click()
+  await page.getByRole('button', { name: 'Dùng sticker', exact: true }).click()
   await expect(page.locator('.daily-sticker-emoji')).toHaveText('💛')
+})
+
+test('canceling or replacing a draft never creates a saved sticker collection', async ({ page }) => {
+  await openPersonalPicker(page)
+  await page.getByLabel('Ảnh sticker từ thiết bị').setInputFiles('public/stickers/sticker-014.png')
+  await expect(page.getByRole('button', { name: 'Dùng sticker', exact: true })).toBeEnabled()
+  expect(await storedImageCount(page)).toBe(0)
+  await page.getByRole('tab', { name: 'Có sẵn', exact: true }).click()
+  await page.getByRole('tab', { name: 'Tự thêm', exact: true }).click()
+  await expect(page.getByRole('button', { name: 'Dùng sticker', exact: true })).toBeDisabled()
+  await page.getByLabel('Ảnh sticker từ thiết bị').setInputFiles('public/stickers/sticker-015.png')
+  await expect(page.getByRole('button', { name: 'Dùng sticker', exact: true })).toBeEnabled()
+  await page.getByRole('button', { name: 'Đóng bộ chọn sticker', exact: true }).click()
+  expect(await storedImageCount(page)).toBe(0)
+  await page.reload()
+  await page.getByRole('button', { name: 'Chọn sticker cho ngày', exact: true }).click()
+  await expect(page.getByRole('button', { name: 'Dùng sticker', exact: true })).toBeDisabled()
 })
 
 test('missing local image remains honestly marked without reassigning first-writer history', async ({ page }) => {
   await openPersonalPicker(page)
   await page.getByLabel('Ảnh sticker từ thiết bị').setInputFiles('public/stickers/sticker-014.png')
-  await page.getByRole('button', { name: 'Lưu sticker', exact: true }).click()
+  await page.getByRole('button', { name: 'Dùng sticker', exact: true }).click()
   await expect(page.locator('.daily-sticker-image[data-image-state="loaded"]')).toBeVisible()
   const id = await page.locator('.daily-sticker-badge').getAttribute('data-sticker-id')
   await page.evaluate(() => new Promise<void>((resolve, reject) => {

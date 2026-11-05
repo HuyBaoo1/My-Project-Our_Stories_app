@@ -84,8 +84,11 @@ export function DayPanel({ dayKey, fullPage = false, initialCompose = false, onS
       <div className="day-ending"><span /><Feather size={15} /><span /></div>
       <p className="day-caption">Mỗi dòng viết, một chút gần nhau hơn.</p>
     </div>
-    {stickerPickerOpen && <StickerPicker onConfirm={async (id) => {
-      if (isPersonalStickerId(id)) await store.assignPersonalDaySticker(dayKey, id, MOCK_MEMBER.uid)
+    {stickerPickerOpen && <StickerPicker onConfirm={async (id, draft) => {
+      if (isPersonalStickerId(id)) {
+        if (!draft || draft.id !== id) throw new Error('Hãy thêm ảnh sticker cho ngày này.')
+        await store.assignPersonalDaySticker(dayKey, draft, MOCK_MEMBER.uid)
+      }
       else store.assignDaySticker(dayKey, id, MOCK_MEMBER.uid)
       setSaved(true)
     }} onClose={() => setStickerPickerOpen(false)} />}

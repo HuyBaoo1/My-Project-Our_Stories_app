@@ -84,11 +84,6 @@ export async function getPersonalSticker(id: string): Promise<PersonalSticker | 
   return readStoredSticker(record)
 }
 
-export async function listPersonalStickers(): Promise<PersonalSticker[]> {
-  const records: unknown[] = await withStore('readonly', (store) => store.getAll())
-  return records.map(readStoredSticker).filter((record): record is PersonalSticker => !!record).sort((a, b) => b.createdAt.localeCompare(a.createdAt))
-}
-
 function canvasPng(image: HTMLImageElement, maximumEdge: number): Promise<{ blob: Blob; width: number; height: number }> {
   const ratio = Math.min(1, maximumEdge / Math.max(image.naturalWidth, image.naturalHeight))
   const width = Math.max(1, Math.round(image.naturalWidth * ratio))
@@ -104,7 +99,7 @@ function canvasPng(image: HTMLImageElement, maximumEdge: number): Promise<{ blob
   }, 'image/png'))
 }
 
-export async function importPersonalSticker(file: Blob): Promise<PersonalSticker> {
+export async function preparePersonalSticker(file: Blob): Promise<PersonalSticker> {
   if (!file.size || file.size > MAX_STICKER_FILE_BYTES) throw new Error('Ảnh sticker phải nhỏ hơn hoặc bằng 5 MB.')
   inspectStickerImage(new Uint8Array(await file.arrayBuffer()), file.type)
   const url = URL.createObjectURL(file)
@@ -119,12 +114,20 @@ export async function importPersonalSticker(file: Blob): Promise<PersonalSticker
     const thumbnail = await canvasPng(image, 96)
     const sticker: PersonalSticker = { id: `personal-${crypto.randomUUID()}`, name: 'Sticker của tôi', blob: full.blob,
       thumbnailBlob: thumbnail.blob, width: full.width, height: full.height, createdAt: new Date().toISOString() }
-    // Prepare bytes before starting the transaction. Some WebKit ports cannot
-    // persist Blob/File objects; ArrayBuffer keeps this local path portable.
-    const [imageBytes, thumbnailBytes] = await Promise.all([full.blob.arrayBuffer(), thumbnail.blob.arrayBuffer()])
-    const stored: StoredPersonalSticker = { id: sticker.id, name: sticker.name, width: sticker.width, height: sticker.height,
-      createdAt: sticker.createdAt, imageBytes, thumbnailBytes }
-    await withStore('readwrite', (store) => store.put(stored))
     return sticker
   } finally { URL.revokeObjectURL(url) }
+}
+
+// Only confirmed day attachments are persisted. Drafts stay in picker memory.
+export async function saveDayStickerImage(sticker: PersonalSticker): Promise<void> {
+  if (!validRecord(sticker)) throw new Error('Ảnh sticker không hợp lệ.')
+  // Prepare bytes before the transaction; WebKit ports may reject stored Blobs.
+  const [imageBytes, thumbnailBytes] = await Promise.all([sticker.blob.arrayBuffer(), sticker.thumbnailBlob.arrayBuffer()])
+  const stored: StoredPersonalSticker = { id: sticker.id, name: sticker.name, width: sticker.width, height: sticker.height,
+    createdAt: sticker.createdAt, imageBytes, thumbnailBytes }
+  await withStore('readwrite', (store) => store.add(stored))
+}
+
+export async function discardDayStickerImage(id: PersonalStickerId): Promise<void> {
+  await withStore('readwrite', (store) => store.delete(id))
 }

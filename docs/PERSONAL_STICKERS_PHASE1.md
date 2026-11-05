@@ -1,65 +1,43 @@
-# Sticker cá nhân từ bàn phím / clipboard — Phase 1
+# Sticker cho ngày — Phase 1
 
-Ngày: 2026-11-06. Yêu cầu mới thay lựa chọn chỉ gồm catalog cố định bằng sticker do người dùng tự thêm. **Vẫn Phase 1, local mock, chưa đồng bộ ảnh hay triển khai Firebase.** Kế hoạch catalog 15 ảnh trước đây được giữ như tài liệu lịch sử; PNG mẫu vẫn dùng được để tương thích với ngày đã chọn trước đó.
+Cập nhật 2026-11-06 theo yêu cầu **Keep the UI simple**. Vẫn là local mock, chờ duyệt UI.
 
-## Giao diện và luồng nhận ảnh
+## Luồng hiện tại
 
-- Tab mặc định **Sticker của bạn** có ô chỉnh sửa nhận ảnh từ `paste` hoặc ảnh được bàn phím chèn vào, một emoji từ bàn phím và nút **Chọn ảnh từ thiết bị** dự phòng.
-- **Dán từ clipboard** chỉ đọc khi người dùng bấm nút, thông qua API mà trình duyệt cung cấp; không tự đọc clipboard khi mở trang. Nếu API/permission không khả dụng, hướng dẫn nhấn giữ ô và dùng Dán.
-- Paste ưu tiên image file; HTML chỉ được kiểm tra để lấy một `data:image/png|jpeg|webp;base64` khi cần. Không render HTML clipboard và không tải ảnh từ URL ngoài. Native image insertion chỉ nhận data URL hợp lệ hoặc blob URL cùng origin.
-- Tab **Bộ mẫu** giữ 15 PNG cũ và các lựa chọn cũ; sticker cá nhân không bị giới hạn vào danh sách này.
-- Người viết đầu tiên vẫn phải xác nhận một lần. Thêm ảnh vào thư viện chưa có nghĩa đã gán cho ngày. Không gán khi ảnh chưa tải thành công, lưu ảnh lỗi hoặc lưu metadata ngày thất bại.
-- Emoji là một grapheme được xác thực, gồm emoji có màu da, gia đình ZWJ, cờ và keycap; không coi văn bản tùy ý, URL hoặc HTML là sticker.
+- **Tự thêm:** dán ảnh sticker đã cắt hoặc emoji từ bàn phím; nút chọn ảnh từ thiết bị là đường dự phòng.
+- **Có sẵn:** chọn một trong 15 PNG mẫu.
+- Xem trước rồi bấm **Dùng sticker** để gắn với ngày. Người viết đầu tiên vẫn được chọn một lần.
+- Không có thư viện sticker cá nhân, lưu vào bộ sticker hoặc giao diện quản lý bộ sưu tập. Ảnh tự thêm không trở thành lựa chọn cho ngày khác.
 
-## Hỗ trợ iPhone và giới hạn đã biết
+## Vòng đời ảnh
 
-Apple hướng dẫn tạo sticker bằng **Ảnh → nhấn giữ chủ thể → Add Sticker**, dùng trong bàn phím/các ứng dụng hỗ trợ. Đây không phải bảo đảm rằng mọi webview/Safari đều đưa cùng dữ liệu ảnh cho trang web. [Apple: tạo sticker từ ảnh](https://support.apple.com/guide/iphone/make-stickers-from-your-photos-iph9b4106303/ios), [Apple: sticker với bàn phím](https://support.apple.com/en-ca/guide/iphone/iph69df21ec5/27/ios/27).
+Ảnh nháp được chuẩn bị trong bộ nhớ, chưa ghi IndexedDB. Đóng bộ chọn, đổi nguồn hoặc chọn ảnh khác thì bỏ ảnh nháp cũ. Chỉ lúc xác nhận, ảnh mới được giữ như dữ liệu đính kèm của ngày để trang ngày và lịch không mất hình sau reload; đây không phải lưu vào thư viện sticker dùng lại.
 
-Luồng dự phòng: **Ảnh → nhấn giữ chủ thể → Sao chép → quay lại ô sticker và Dán**; hoặc chọn PNG đã cắt từ thiết bị. Giao diện không liệt kê trực tiếp bộ sticker cá nhân của iOS. Website chỉ nhận dữ liệu mà hệ điều hành/trình duyệt chuyển cho thao tác nhập/dán, không truy cập tài khoản iCloud hay thư viện sticker riêng của hệ điều hành.
+Nếu lưu metadata thất bại, cố gắng xóa bản ảnh vừa ghi và giữ preview trong hộp thoại để thử lại. IndexedDB và localStorage không có transaction chung; nếu bước dọn dẹp cũng lỗi, có thể còn dữ liệu ảnh không gắn ngày, nhưng không hiển thị thành thư viện. Dữ liệu đã xác nhận ở phiên bản trước được giữ để bảo toàn lịch sử, không tự xóa dữ liệu người dùng.
 
-WebKit ghi nhận Safari 26.4 đã sửa tình huống Copy Image mang theo URL làm website nhận URL thay vì ảnh. Điều này củng cố việc cần fallback và ưu tiên dữ liệu ảnh; nó không xác nhận bàn phím sticker trên một iPhone cụ thể. [WebKit clipboard fixes](https://webkit.org/blog/17862/webkit-features-for-safari-26-4/).
+Ảnh PNG/JPEG/WebP tối đa 5 MB, cạnh tối đa 4096px, được kiểm tra header trước decode. Canvas chuyển local thành PNG tối đa 512px/192 KiB và thumbnail 96px, giữ alpha sẵn có; ảnh không được tự cắt nền. Dữ liệu ảnh lưu ArrayBuffer trong IndexedDB; localStorage chỉ giữ ID/metadata. Object URLs được thu hồi khi không còn dùng. Không upload, không thêm ảnh người dùng vào Git/log/artifact; QA chỉ dùng PNG fixture của repo.
 
-Clipboard paste được xử lý bằng [`ClipboardEvent.clipboardData`](https://developer.mozilla.org/en-US/docs/Web/API/ClipboardEvent/clipboardData) và [`DataTransfer.files`](https://developer.mozilla.org/en-US/docs/Web/API/DataTransfer/files). API đọc clipboard theo nút là cách bổ sung; event paste và chọn file vẫn là đường dự phòng.
+Ảnh chưa đồng bộ giữa thiết bị/thành viên. Firestore vẫn deny-all, chưa có Firebase Storage hoặc deployment. Việc đồng bộ ảnh dùng chung cần thiết kế và phê duyệt ở phase sau.
 
-**Chưa kiểm thử iPhone thật.** Playwright WebKit trên Windows là kiểm tra web engine/viewport, không mô phỏng thư viện sticker, bàn phím, quyền clipboard hoặc hệ điều hành iOS thật. Trước khi nghiệm thu cần thử bàn phím sticker, Sao chép/Dán chủ thể và chọn file trên Safari của thiết bị mục tiêu.
+## iPhone
 
-## Lưu dữ liệu và quyền chọn
+Website chỉ nhận dữ liệu mà bàn phím/trình duyệt chuyển vào thao tác nhập hoặc paste; không liệt kê thư viện sticker riêng của iOS. Có thể thử Sao chép chủ thể từ Ảnh rồi Dán, hoặc chọn PNG đã cắt. Apple mô tả sticker trong các ứng dụng hỗ trợ: [hướng dẫn tạo sticker](https://support.apple.com/guide/iphone/make-stickers-from-your-photos-iph9b4106303/ios).
 
-- Ảnh import được giải mã local, thu nhỏ giữ tỉ lệ thành PNG tối đa 512px; thumbnail tối đa 96px. Giữ alpha nếu ảnh có alpha, không tự cắt nền mới hoặc gửi ảnh đi xử lý ở dịch vụ ngoài.
-- Chỉ nhận PNG/JPEG/WebP tối đa 5 MB, giới hạn kích thước ảnh; output PNG được giới hạn dung lượng. SVG, HTML và ảnh giả header bị từ chối. Sticker động không được bảo đảm giữ chuyển động; mục tiêu hiện tại là ảnh tĩnh.
-- Binary ảnh nằm trong **IndexedDB của origin trên thiết bị**, dưới dạng ArrayBuffer, không trong localStorage, Firestore, Git hoặc log. Blob URLs chỉ được tạo khi cần hiển thị rồi thu hồi khi hết dùng. LocalStorage của diary chỉ lưu ID `personal-<UUID>` hoặc ID emoji đã mã hóa, cùng metadata ngày.
-- Store kiểm tra ảnh cá nhân tồn tại trước khi gán và kiểm tra lại quyền người viết đầu tiên sau lần đọc async. Catalog/emoji tiếp tục dùng đường lưu đồng bộ cũ; các guard first-writer và không thay lựa chọn đã gán được dùng chung.
-- Ngày đã gán giữ nguyên ID và attribution sau reload, chỉnh sửa/ẩn ghi chú. Dữ liệu cũ chỉ dùng catalog vẫn tương thích. Nếu ảnh local bị xóa mà metadata còn, hiển thị thiếu ảnh thay vì tự gán sticker khác hoặc chuyển người viết đầu tiên.
-- Không có bảo đảm atomic giữa IndexedDB và localStorage hay giữa các tab/thiết bị. Import bị hủy hoặc metadata lưu lỗi có thể để ảnh trong thư viện để dùng lại; không có thao tác xóa thư viện tự động làm mất ảnh lịch sử.
-- Bản thân nhập ảnh không phát request upload. Object URLs được thu hồi khi hết dùng. Ảnh người dùng không được copy vào repo, artifact QA hoặc dịch vụ bên ngoài; test chỉ dùng fixture công khai đã có trong repo.
+Paste ưu tiên image file; HTML chỉ được đọc để lấy data URI ảnh hợp lệ, không render hoặc tải URL ngoài. Native image insertion nhận data URI hoặc blob URL cùng origin. Tham khảo [ClipboardEvent.clipboardData](https://developer.mozilla.org/en-US/docs/Web/API/ClipboardEvent/clipboardData), [DataTransfer.files](https://developer.mozilla.org/en-US/docs/Web/API/DataTransfer/files), [WebKit: Safari 26.4 clipboard fixes](https://webkit.org/blog/17862/webkit-features-for-safari-26-4/).
 
-## Khác biệt so với bản dùng chung tương lai
+**Chưa kiểm thử bàn phím iPhone thật.** Playwright WebKit trên Windows chỉ kiểm tra engine/viewport và event tổng hợp.
 
-Ảnh chỉ ở thiết bị thêm nó. Cùng một ID sẽ không khiến thành viên trên máy khác tự nhận được binary ảnh. Vì vậy đây chưa phải thiết kế lưu sticker dùng chung production.
+## Kiểm tra
 
-Để sử dụng thật phải duyệt lại yêu cầu **không upload/không image storage** và chọn một phương án lưu ảnh dùng chung, phân quyền, retention, quota và backup. Không tự nhét base64 ảnh vào Firestore để lách quyết định này, không bật billing/Storage hoặc dịch vụ trả phí trong Phase 1. Các transaction, membership/rules và deployment vẫn chưa được triển khai.
-
-## Kiểm tra và điểm dừng
-
-Đã thực thi ngày 2026-11-06:
+Đã chạy sau khi đơn giản hóa UI:
 
 | Kiểm tra | Kết quả |
 | --- | --- |
-| `npm run lint` | Qua, không lỗi/cảnh báo lint |
-| `npm run typecheck` | Qua |
-| `npm test` | 72 tests qua, 7 files |
+| `npm run lint`, `npm run typecheck` | Qua |
+| `npm test` | 72 unit tests qua |
 | `npm run build` | Qua |
-| `npm run test:e2e` | 59 tests qua trong 2,7 phút; Chromium desktop/mobile và WebKit viewport iPhone 13 |
+| `npm run test:e2e` | 62 tests qua trong 2,1 phút: Chromium desktop/mobile và WebKit |
 
-27 browser cases kiểm tra 9 luồng sticker cá nhân trên ba cấu hình; 32 cases còn lại kiểm tra hồi quy giao diện và catalog cũ trên Chromium desktop/mobile. Các luồng mới gồm emoji, clipboard image, ảnh từ thiết bị và dùng lại, native image insertion tổng hợp, lỗi lưu metadata, đầu vào không hợp lệ/URL ngoài, IndexedDB không khả dụng và ảnh local đã mất. Kiểm tra ảnh dán không phát sinh request HTTP ra origin ngoài. Unit tests bổ sung xác thực ID/emoji và header/kích thước ảnh PNG/JPEG/WebP trước decode. Firestore Rules không đổi; không chạy lại emulator trong lượt cập nhật này.
+Phạm vi browser gồm nhập ảnh/emoji, ảnh gắn ngày sau reload, không có lựa chọn dùng lại ở ngày khác, hủy/đổi nguồn không ghi ảnh, lỗi metadata dọn ảnh chưa gắn và hồi quy catalog/first writer. Đã kiểm tra trực quan [Tự thêm trên mobile](../artifacts/simple-sticker-picker-mobile.png), [Có sẵn trên mobile](../artifacts/simple-sticker-samples-mobile.png) và ảnh desktop tương ứng trong thư mục `artifacts/` bị Git ignore. Log browser: `artifacts/simple-stickers-e2e.log`. Firestore Rules không đổi; không chạy lại emulator cho thay đổi này.
 
-Kiểm thử đầu tiên đã tái hiện lỗi thiếu mục nhập cá nhân trước khi triển khai. Lượt browser đầu phát hiện lỗi WebKit Windows không persist được Blob vào IndexedDB; probe độc lập cho kết quả text qua, Blob lỗi `UnknownError`, ArrayBuffer qua. Đã đổi persistence sang ArrayBuffer và chạy lại toàn bộ suite thành công. Một assertion đọc metadata quá sớm sau thao tác async cũng được đổi thành assertion chờ trạng thái lưu thực tế.
-
-Đã kiểm tra trực quan ảnh chụp desktop/mobile. Artifact local (bị Git ignore) dùng PNG fixture của repo, không dùng ảnh riêng tư:
-
-- [Bộ chọn desktop](../artifacts/personal-sticker-picker-desktop.png)
-- [Bộ chọn mobile](../artifacts/personal-sticker-picker-mobile.png)
-- [Trang ngày mobile sau khi lưu](../artifacts/personal-sticker-day-mobile.png)
-- Log browser: `artifacts/personal-stickers-final-e2e.log`.
-
-Không thêm dependency, không bật dịch vụ Firebase, không upload, push hoặc deploy. Rủi ro bảo mật và audit dependency đã ghi trong báo cáo trước vẫn chưa được giải quyết bởi thay đổi UI này. Không coi thao tác paste tổng hợp trong automation là bằng chứng bàn phím iPhone thật hoạt động. UI và luồng sticker cá nhân vẫn chờ chủ repo duyệt trong Phase 1.
+Lượt trước tại commit `108c8d7` có 72 unit tests và 59 browser tests qua; thiết kế thư viện dùng lại trong lượt đó đã được thay bằng phạm vi hiện tại. Review catalog cũ không bao gồm cập nhật này. Không thêm dependency hoặc bật billing/dịch vụ cloud. Các rủi ro bảo mật/audit đã ghi trong báo cáo trước vẫn còn; local mock chưa dành cho nhật ký riêng tư dùng thật.
