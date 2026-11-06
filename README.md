@@ -49,6 +49,7 @@ Lệnh trên chạy Auth (9099), Firestore (8080), Hosting (5000, cần build tr
 
 ## Tài liệu
 
+- [Checkpoint để tiếp tục Phase 2](docs/PHASE_2_HANDOFF.md): trạng thái lưu ngày 2026-11-07, việc cần làm và giới hạn còn mở.
 - [Báo cáo Phase 1](PHASE_1_REPORT.md): kết quả thực tế, giới hạn và bước tiếp theo.
 - [Ma trận yêu cầu và rủi ro](docs/REQUIREMENTS_MATRIX.md).
 - [Thiết kế lại UI và ảnh QA](docs/UI_REDESIGN.md).

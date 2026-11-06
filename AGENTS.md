@@ -22,6 +22,7 @@ Build an invite-link-based private collaborative diary (calendar-first, text-onl
 
 ## Development cadence
 
+- When resuming Phase 2, read `docs/PHASE_2_HANDOFF.md` for the saved checkpoint, latest UI decisions, validation and remaining gates.
 - One roadmap phase at a time. Produce reviewable diffs and meaningful commits.
 - Prefer small, auditable modules and transparent data access patterns.
 - Use Firebase Emulator for security tests; test owner/member/nonmember, invite revocation, stale-edit conflicts and schema validation.

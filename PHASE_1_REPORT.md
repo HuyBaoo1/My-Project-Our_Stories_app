@@ -2,6 +2,8 @@
 
 Ngày thực hiện: **2026-11-05**, múi giờ `Asia/Ho_Chi_Minh`.
 
+**Checkpoint 2026-11-07:** trạng thái hiện tại và thứ tự tiếp tục nằm trong [PHASE_2_HANDOFF.md](docs/PHASE_2_HANDOFF.md). Các ghi chú chưa push và số liệu của scaffold bên dưới là lịch sử tại thời điểm báo cáo; yêu cầu mới cho phép đẩy checkpoint lên GitHub, chưa cho phép triển khai Phase 2.
+
 **Cập nhật 2026-11-06 — Keep the UI simple:** bộ chọn chỉ có **Tự thêm** và **Có sẵn**. Sticker tự thêm gắn với ngày được xác nhận, không thêm vào thư viện hay bộ sticker dùng lại; hủy thì bỏ ảnh nháp. Ảnh gắn ngày chỉ lưu local, chưa đồng bộ. Xem [phạm vi, kết quả kiểm tra và giới hạn iPhone](docs/PERSONAL_STICKERS_PHASE1.md). Vẫn Phase 1, chờ duyệt UI. Báo cáo và review catalog bên dưới ghi lại phiên bản trước, không bao gồm thay đổi sticker cá nhân.
 
 **Cập nhật UI:** giao diện đầu tiên chưa được chủ repo duyệt. Giao diện đã được thiết kế lại theo reference CapLog; trạng thái vẫn **chờ duyệt UI**, chưa được phép sang Phase 2. Kết quả và ảnh kiểm tra mới nằm trong [UI_REDESIGN.md](docs/UI_REDESIGN.md). Các số liệu kiểm tra bên dưới ghi lại lượt triển khai Phase 1 ban đầu.
